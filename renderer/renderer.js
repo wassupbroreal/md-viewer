@@ -379,13 +379,6 @@ async function loadRecent() {
     const body = document.createElement('div');
     body.className = 'ri-body';
     body.innerHTML =
-      '<span class="ri-icon">' +
-        '<svg width="15" height="15" viewBox="0 0 16 16" fill="none">' +
-          '<path d="M2.5 1h8L14 4.5V15a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 2 15V1.5A.5.5 0 0 1 2.5 1z"' +
-          ' stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' +
-          '<path d="M10.5 1v3.5H14" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>' +
-        '</svg>' +
-      '</span>' +
       '<div class="ri-text">' +
         '<div class="ri-name">' + esc(f.name) + '</div>' +
         '<div class="ri-dir">' + esc(dir) + '</div>' +
