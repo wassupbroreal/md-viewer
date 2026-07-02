@@ -295,7 +295,7 @@ html, body {
   height: 100%; /* fills entire item height (38px) */
   border: none; border-radius: 0; /* square edges */
   background: transparent; color: var(--text-3);
-  font-size: 15px; /* Larger close icon */
+  font-size: 18px; /* Larger close icon */
   line-height: 1;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -344,22 +344,15 @@ html, body {
 .icon-btn.sm { width: 24px; height: 24px; font-size: 12px; }
 
 /* ================================================
-   SEARCH — animated slide-down
+   SEARCH — instant appearance
    ================================================ */
 .search-wrap {
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: max-height .2s ease, opacity .18s ease, transform .18s ease;
+  display: none;
   background: var(--bg-surface);
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid var(--border);
 }
 .search-wrap.open {
-  max-height: var(--search-h);
-  opacity: 1;
-  transform: translateY(0);
-  border-bottom-color: var(--border);
+  display: block;
 }
 
 .search-inner {

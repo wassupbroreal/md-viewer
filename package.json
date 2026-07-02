@@ -1,6 +1,6 @@
 {
   "name": "wassupbro",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A beautiful desktop Markdown viewer built with Tauri",
   "scripts": {
     "tauri": "tauri",
