@@ -1,24 +1,20 @@
 {
-  "name": "md-viewer",
+  "name": "wassupbro",
   "version": "1.0.0",
-  "description": "A beautiful desktop Markdown viewer built with Electron",
-  "main": "main.js",
+  "description": "A beautiful desktop Markdown viewer built with Tauri",
   "scripts": {
-    "start": "electron ."
+    "tauri": "tauri",
+    "start": "tauri dev",
+    "build": "tauri build && node -e \"const fs = require('fs'); fs.copyFileSync('./src-tauri/target/release/bundle/nsis/MD Viewer_1.0.0_x64-setup.exe', './dist/MD Viewer Setup.exe'); fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\"",
+    "dist": "tauri build && node -e \"const fs = require('fs'); fs.copyFileSync('./src-tauri/target/release/bundle/nsis/MD Viewer_1.0.0_x64-setup.exe', './dist/MD Viewer Setup.exe'); fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\""
   },
-  "keywords": [
-    "markdown",
-    "viewer",
-    "electron",
-    "desktop"
-  ],
-  "author": "",
+  "author": "wassupbro",
   "license": "MIT",
-  "devDependencies": {
-    "electron": "^43.0.0"
-  },
   "dependencies": {
-    "highlight.js": "^11.9.0",
-    "marked": "^12.0.0"
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.7.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
   }
 }

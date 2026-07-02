@@ -1,8 +1,146 @@
 'use strict';
 
-if (!window.api) {
-  document.body.innerHTML = '<pre style="padding:2em;color:red">Ошибка: window.api не определён.</pre>';
-  throw new Error('window.api is undefined');
+// ── Tauri API Adapter ────────────────────────────────────────────────────────
+const invoke = window.__TAURI__ ? window.__TAURI__.core.invoke : null;
+const dialog = window.__TAURI__ ? window.__TAURI__.dialog : null;
+const listen = window.__TAURI__ ? window.__TAURI__.event.listen : null;
+
+// Callbacks container for emulation of Electron ipcRenderer listeners
+const listeners = {
+  loading: [],
+  file: [],
+  error: []
+};
+
+// Emulated API object mapping Electron IPCs to Tauri commands
+window.api = {
+  minimize:       () => invoke && invoke('win_minimize'),
+  maximize:       () => invoke && invoke('win_maximize'),
+  close:          () => invoke && invoke('win_close'),
+
+  openDialog:     async () => {
+    if (!dialog) return;
+    try {
+      const selected = await dialog.open({
+        title: 'Открыть Markdown файл',
+        filters: [
+          { name: 'Markdown / Text', extensions: ['md', 'markdown', 'mdx', 'txt'] },
+          { name: 'Все файлы', extensions: ['*'] }
+        ]
+      });
+      if (selected) {
+        window.api.openFile(selected);
+      }
+    } catch (err) {
+      listeners.error.forEach(cb => cb(String(err)));
+    }
+  },
+
+  openFile:       async (path) => {
+    if (!invoke) return;
+    listeners.loading.forEach(cb => cb());
+    try {
+      await invoke('add_recent', { pathStr: path });
+      const data = await invoke('read_file', { pathStr: path });
+      const html = parseMarkdown(data.content);
+      listeners.file.forEach(cb => cb({
+        path: data.path,
+        name: data.name,
+        html: html,
+        size: data.size,
+        modified: data.modified
+      }));
+    } catch (err) {
+      listeners.error.forEach(cb => cb(String(err)));
+    }
+  },
+
+  getRecent:      () => invoke ? invoke('get_recent') : Promise.resolve([]),
+  removeRecent:   (p) => invoke ? invoke('remove_recent', { pathStr: p }) : Promise.resolve(),
+  showInExplorer: (p) => invoke && invoke('show_in_explorer', { pathStr: p }),
+
+  getPath:        (file) => file.path || '',
+
+  onLoading: (cb) => listeners.loading.push(cb),
+  onFile:    (cb) => listeners.file.push(cb),
+  onError:   (cb) => listeners.error.push(cb),
+};
+
+// Listen to tauri single instance events
+if (listen) {
+  listen('open-file', (event) => {
+    const filePath = event.payload;
+    if (filePath) {
+      window.api.openFile(filePath);
+    }
+  });
+}
+
+function parseMarkdown(content) {
+  marked.use({ async: false, gfm: true, breaks: true });
+  const rawHtml = String(marked.parse(content));
+  const html = rawHtml
+    .replace(
+      /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
+      (_, lang, code) => {
+        const decoded = code
+          .replace(/&amp;/g, '&').replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+        let highlighted = decoded;
+        try {
+          highlighted = hljs.getLanguage(lang)
+            ? hljs.highlight(decoded, { language: lang }).value
+            : hljs.highlightAuto(decoded).value;
+        } catch { /* keep original */ }
+        return `<pre class="code-block" data-lang="${lang}"><code>${highlighted}</code></pre>`;
+      }
+    )
+    .replace(
+      /<pre><code>([\s\S]*?)<\/code><\/pre>/g,
+      '<pre class="code-block"><code>$1</code></pre>'
+    );
+  return html;
+}
+
+// ── Update Checker ────────────────────────────────────────────────────────────
+setTimeout(async () => {
+  if (!invoke || !dialog) return;
+  try {
+    const currentVersion = await invoke('get_app_version');
+    const res = await fetch('https://api.github.com/repos/wassupbro/md-viewer/releases/latest', {
+      headers: { 'User-Agent': 'Tauri-MD-Viewer-Updater' }
+    });
+    if (res.status !== 200) return;
+    const release = await res.json();
+    if (!release || !release.tag_name) return;
+
+    const latestVersion = release.tag_name.replace(/^v/, '');
+    if (isNewerVersion(latestVersion, currentVersion)) {
+      const confirm = await dialog.ask(
+        `Доступна новая версия ${release.tag_name}!\n\nТекущая версия: v${currentVersion}\nНовая версия: ${release.tag_name}\n\nХотите открыть страницу загрузки в браузере?`,
+        {
+          title: 'Доступно обновление',
+          okLabel: 'Скачать',
+          cancelLabel: 'Позже'
+        }
+      );
+      if (confirm) {
+        await invoke('open_external', { url: release.html_url });
+      }
+    }
+  } catch (err) {
+    console.error('Update check failed:', err);
+  }
+}, 3000);
+
+function isNewerVersion(latest, current) {
+  const l = latest.split('.').map(Number);
+  const c = current.split('.').map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((l[i] || 0) > (c[i] || 0)) return true;
+    if ((l[i] || 0) < (c[i] || 0)) return false;
+  }
+  return false;
 }
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -56,7 +194,6 @@ $('btn-toggle-sidebar').addEventListener('click', () => el.sidebar.classList.tog
 
 // ── Open file ─────────────────────────────────────────────────────────────────
 $('btn-open').addEventListener('click',         () => window.api.openDialog());
-$('btn-welcome-open').addEventListener('click', () => window.api.openDialog());
 
 // ── Explorer ──────────────────────────────────────────────────────────────────
 el.btnExplorer.addEventListener('click', () => {
@@ -162,7 +299,7 @@ function showWelcome() {
   el.mdOut.innerHTML       = '';
   el.welcome.style.display = '';
   el.winTitle.textContent  = '';
-  el.toolbarPath.innerHTML = '<span class="path-hint">Выберите файл для просмотра</span>';
+  el.toolbarPath.innerHTML = '<span class="path-hint">' + (typeof settings !== 'undefined' && settings.lang === 'ru' ? 'Выберите файл для просмотра' : 'Select a file to view') + '</span>';
   el.fileMeta.textContent  = '';
   el.btnExplorer.style.display = 'none';
   if (searchOpen) closeSearch();
@@ -180,7 +317,6 @@ function renderContent(data) {
     const btn = document.createElement('button');
     btn.className   = 'copy-btn';
     btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>';
-    btn.title = 'Копировать';
     btn.onclick = () => {
       const code = pre.querySelector('code');
       navigator.clipboard.writeText(code ? code.innerText : pre.innerText).then(() => {
@@ -214,6 +350,9 @@ function renderContent(data) {
   el.viewport.scrollTop        = 0;
 
   loadRecent();
+  if (typeof settings !== 'undefined' && settings.lineNumbers) {
+    updateAllCodeBlocksLineNumbers();
+  }
   if (searchOpen && el.searchInput.value) doSearch(el.searchInput.value);
 }
 
@@ -223,7 +362,7 @@ async function loadRecent() {
   el.recentList.innerHTML = '';
 
   if (!files.length) {
-    el.recentList.innerHTML = '<li class="recent-empty">Нет недавних файлов</li>';
+    el.recentList.innerHTML = '<li class="recent-empty">' + (typeof settings !== 'undefined' && settings.lang === 'ru' ? 'Нет недавних файлов' : 'No recent files') + '</li>';
     return;
   }
 
@@ -262,7 +401,6 @@ async function loadRecent() {
     // Remove button
     const rmBtn = document.createElement('button');
     rmBtn.className = 'ri-rm';
-    rmBtn.title = 'Удалить из списка';
     rmBtn.textContent = '×';
     rmBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -280,20 +418,24 @@ async function loadRecent() {
 
 // ── Drag & drop ───────────────────────────────────────────────────────────────
 function setupDrop() {
-  let active = false;
-  document.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    if (!active) { active = true; el.dropOverlay.style.display = 'flex'; }
-  });
-  document.addEventListener('dragleave', (e) => {
-    if (!e.relatedTarget) { active = false; el.dropOverlay.style.display = 'none'; }
-  });
-  document.addEventListener('drop', (e) => {
-    e.preventDefault();
-    active = false; el.dropOverlay.style.display = 'none';
-    const f = e.dataTransfer.files[0];
-    if (f && f.path) window.api.openFile(f.path);
-  });
+  if (listen) {
+    listen('tauri://drag-over', () => {
+      el.dropOverlay.style.display = 'flex';
+    });
+
+    listen('tauri://drag-leave', () => {
+      el.dropOverlay.style.display = 'none';
+    });
+
+    listen('tauri://drag-drop', (event) => {
+      el.dropOverlay.style.display = 'none';
+      const payload = event.payload;
+      const paths = payload && (payload.paths || (Array.isArray(payload) ? payload : null));
+      if (paths && paths.length > 0) {
+        window.api.openFile(paths[0]);
+      }
+    });
+  }
 }
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
@@ -316,3 +458,172 @@ function fmtSize(b) {
 function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' });
 }
+
+// ── Settings & Localization ───────────────────────────────────────────────────
+const settingsModal = $('settings-modal');
+const btnSettings = $('btn-settings');
+const btnSettingsClose = $('btn-settings-close');
+
+// i18n Translations Dictionary
+const i18n = {
+  en: {
+    openBtn: 'Open File',
+    recentEmpty: 'No recent files',
+    pathHint: 'Select a file to view',
+    searchPlaceholder: 'Search',
+    searchNotFound: 'Not found',
+    settingsTitle: 'Settings',
+    fontSizeLabel: 'Font Size:',
+    fontFamilyLabel: 'Content Font:',
+    themeLabel: 'Theme:',
+    langLabel: 'Language:',
+    optSizeSm: '12 px (Small)',
+    optSizeStd: '13 px (Standard)',
+    optSizeMed: '14 px (Medium)',
+    optSizeLg: '16 px (Large)',
+    optSizeXl: '18 px (Extra Large)',
+    optFamilySans: 'Sans-serif (Inter)',
+    optFamilyMono: 'Monospace (JetBrains)',
+    optFamilySerif: 'Serif (Georgia)',
+    optThemeLight: 'Light',
+    optThemeDark: 'Dark'
+  },
+  ru: {
+    openBtn: 'Открыть файл',
+    recentEmpty: 'Нет недавних файлов',
+    pathHint: 'Выберите файл для просмотра',
+    searchPlaceholder: 'Поиск',
+    searchNotFound: 'Не найдено',
+    settingsTitle: 'Настройки',
+    fontSizeLabel: 'Размер шрифта текста:',
+    fontFamilyLabel: 'Шрифт контента:',
+    themeLabel: 'Тема оформления:',
+    langLabel: 'Язык приложения:',
+    optSizeSm: '12 px (Мелкий)',
+    optSizeStd: '13 px (Стандартный)',
+    optSizeMed: '14 px (Средний)',
+    optSizeLg: '16 px (Крупный)',
+    optSizeXl: '18 px (Очень крупный)',
+    optFamilySans: 'Без засечек (Inter)',
+    optFamilyMono: 'Моноширинный (JetBrains)',
+    optFamilySerif: 'С засечками (Georgia)',
+    optThemeLight: 'Светлая',
+    optThemeDark: 'Темная'
+  }
+};
+
+// Load settings on startup (default values: lang -> 'en', theme -> 'light')
+let settings = {
+  fontSize: localStorage.getItem('setting-font-size') || '13px',
+  fontFamily: localStorage.getItem('setting-font-family') || 'var(--font-inter)',
+  theme: localStorage.getItem('setting-theme') || 'light',
+  lang: localStorage.getItem('setting-lang') || 'en'
+};
+
+function initSettings() {
+  // Bind inputs
+  $('setting-font-size').value = settings.fontSize;
+  $('setting-font-family').value = settings.fontFamily;
+  $('setting-theme').value = settings.theme;
+  $('setting-lang').value = settings.lang;
+
+  // Apply settings initially
+  applySettings();
+
+  // Listeners for Modal
+  btnSettings.addEventListener('click', () => {
+    settingsModal.style.display = 'flex';
+  });
+  btnSettingsClose.addEventListener('click', () => {
+    settingsModal.style.display = 'none';
+  });
+  settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+      settingsModal.style.display = 'none';
+    }
+  });
+
+  // Settings Change Events
+  $('setting-font-size').addEventListener('change', (e) => {
+    settings.fontSize = e.target.value;
+    localStorage.setItem('setting-font-size', settings.fontSize);
+    applySettings();
+  });
+
+  $('setting-font-family').addEventListener('change', (e) => {
+    settings.fontFamily = e.target.value;
+    localStorage.setItem('setting-font-family', settings.fontFamily);
+    applySettings();
+  });
+
+  $('setting-theme').addEventListener('change', (e) => {
+    settings.theme = e.target.value;
+    localStorage.setItem('setting-theme', settings.theme);
+    applySettings();
+  });
+
+  $('setting-lang').addEventListener('change', (e) => {
+    settings.lang = e.target.value;
+    localStorage.setItem('setting-lang', settings.lang);
+    applySettings();
+  });
+
+  // Load app version in footer
+  if (invoke) {
+    invoke('get_app_version').then(v => {
+      $('app-version-text').textContent = 'v' + v;
+    }).catch(err => console.error(err));
+  }
+}
+
+function applySettings() {
+  const mdOut = el.mdOut;
+  // Apply fonts
+  mdOut.style.fontSize = settings.fontSize;
+  mdOut.style.fontFamily = settings.fontFamily;
+
+  // Apply theme
+  document.documentElement.classList.toggle('dark', settings.theme === 'dark');
+
+  // Apply language (translate all elements)
+  const dict = i18n[settings.lang];
+
+  // Sidebar
+  const openBtnSpan = $('btn-open').querySelector('span');
+  if (openBtnSpan) openBtnSpan.textContent = dict.openBtn;
+
+  // Recent list empty state
+  loadRecent();
+
+  // Toolbar path hint
+  if (!currentFilePath) {
+    el.toolbarPath.innerHTML = '<span class="path-hint">' + dict.pathHint + '</span>';
+  }
+
+  // Search input placeholder
+  el.searchInput.placeholder = dict.searchPlaceholder;
+
+  // Settings Modal labels
+  $('settings-title-text').textContent = dict.settingsTitle;
+  $('label-font-size').textContent = dict.fontSizeLabel;
+  $('label-font-family').textContent = dict.fontFamilyLabel;
+  $('label-theme').textContent = dict.themeLabel;
+  $('label-lang').textContent = dict.langLabel;
+
+  // Select options
+  $('opt-size-sm').textContent = dict.optSizeSm;
+  $('opt-size-std').textContent = dict.optSizeStd;
+  $('opt-size-med').textContent = dict.optSizeMed;
+  $('opt-size-lg').textContent = dict.optSizeLg;
+  $('opt-size-xl').textContent = dict.optSizeXl;
+
+  $('opt-family-sans').textContent = dict.optFamilySans;
+  $('opt-family-mono').textContent = dict.optFamilyMono;
+  $('opt-family-serif').textContent = dict.optFamilySerif;
+
+  $('opt-theme-light').textContent = dict.optThemeLight;
+  $('opt-theme-dark').textContent = dict.optThemeDark;
+}
+
+// Call initSettings on boot
+initSettings();
