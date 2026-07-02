@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self';" />
+  <title>MD Viewer</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <!-- Splash screen — hides FOUC, fades out after 500ms -->
+  <div id="splash">
+    <div class="splash-ring"></div>
+  </div>
+
+  <!-- Title bar -->
+  <header class="titlebar">
+    <!-- App name — always left -->
+    <span class="tb-app">MD Viewer</span>
+    <!-- Drag spacer left -->
+    <div class="tb-drag"></div>
+    <!-- File name — always center -->
+    <span class="tb-file" id="win-title"></span>
+    <!-- Drag spacer right -->
+    <div class="tb-drag"></div>
+    <!-- Window control buttons -->
+    <div class="titlebar-btns">
+      <button id="btn-min"   class="wbtn"           aria-label="Свернуть">
+        <svg width="10" height="1"><rect width="10" height="1" fill="currentColor"/></svg>
+      </button>
+      <button id="btn-max"   class="wbtn"           aria-label="Развернуть">
+        <svg width="10" height="10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="currentColor"/></svg>
+      </button>
+      <button id="btn-close" class="wbtn wbtn-close" aria-label="Закрыть">
+        <svg width="10" height="10"><path d="M0 0l10 10M10 0L0 10" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <button class="btn-open" id="btn-open">
+          <span>Открыть файл</span>
+          <span class="material-symbols-outlined btn-icon" style="font-size:15px">folder_open</span>
+        </button>
+      </div>
+
+      <div class="sidebar-body">
+        <ul class="recent" id="recent-list">
+          <li class="recent-empty">Нет недавних файлов</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Content pane -->
+    <div class="pane">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <button class="icon-btn" id="btn-toggle-sidebar" title="Боковая панель">
+          <span class="material-symbols-outlined">view_sidebar</span>
+        </button>
+        <div class="toolbar-path" id="toolbar-path">
+          <span class="path-hint">Выберите файл для просмотра</span>
+        </div>
+        <div class="toolbar-right">
+          <button class="icon-btn" id="btn-search" title="Поиск  Ctrl+F">
+            <span class="material-symbols-outlined">search</span>
+          </button>
+          <button class="icon-btn" id="btn-explorer" style="display:none" title="Показать в проводнике">
+            <span class="material-symbols-outlined">open_in_new</span>
+          </button>
+          <span class="file-meta" id="file-meta"></span>
+        </div>
+      </div>
+
+      <!-- Search bar (animated, hidden via CSS class) -->
+      <div class="search-wrap" id="search-wrap">
+        <div class="search-inner">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input id="search-input" type="text" placeholder="Поиск" autocomplete="off" spellcheck="false" />
+          <button class="icon-btn sm search-nav-btn" id="btn-s-prev" tabindex="-1" title="Предыдущее">▲</button>
+          <button class="icon-btn sm search-nav-btn" id="btn-s-next" tabindex="-1" title="Следующее">▼</button>
+          <span class="search-count" id="search-count"></span>
+          <button class="icon-btn sm search-close" id="btn-s-close" tabindex="-1" title="Закрыть">✕</button>
+        </div>
+      </div>
+
+      <!-- Viewport -->
+      <div class="viewport" id="viewport">
+
+        <!-- Loading spinner (hidden by default via style) -->
+        <div class="spinner-wrap" id="spinner" style="display:none">
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Welcome -->
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">
+            <svg width="36" height="36" viewBox="0 0 16 16" fill="none">
+              <path d="M2.5 1h8L14 4.5V15a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 2 15V1.5A.5.5 0 0 1 2.5 1z" stroke="currentColor" stroke-linejoin="round"/>
+              <path d="M10.5 1v3.5H14" stroke="currentColor" stroke-linejoin="round"/>
+              <line x1="5" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-linecap="round"/>
+              <line x1="5" y1="10"  x2="11" y2="10"  stroke="currentColor" stroke-linecap="round"/>
+              <line x1="5" y1="12.5" x2="9" y2="12.5" stroke="currentColor" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h1>MD Viewer</h1>
+          <button class="welcome-btn" id="btn-welcome-open">
+            <span class="material-symbols-outlined" style="font-size:15px">folder_open</span>
+            Открыть файл
+          </button>
+        </div>
+
+        <!-- Markdown output (hidden by default via style) -->
+        <article class="md" id="md-out" style="display:none"></article>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Drop overlay -->
+  <div class="drop-overlay" id="drop-overlay" style="display:none"></div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

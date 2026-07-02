@@ -1,0 +1,24 @@
+{
+  "name": "md-viewer",
+  "version": "1.0.0",
+  "description": "A beautiful desktop Markdown viewer built with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "markdown",
+    "viewer",
+    "electron",
+    "desktop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^43.0.0"
+  },
+  "dependencies": {
+    "highlight.js": "^11.9.0",
+    "marked": "^12.0.0"
+  }
+}
