@@ -1,12 +1,12 @@
 {
   "name": "wassupbro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A beautiful desktop Markdown viewer built with Tauri",
   "scripts": {
     "tauri": "tauri",
     "start": "tauri dev",
-    "build": "tauri build && node -e \"const fs = require('fs'); fs.copyFileSync('./src-tauri/target/release/bundle/nsis/MD Viewer_1.0.0_x64-setup.exe', './dist/MD Viewer Setup.exe'); fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\"",
-    "dist": "tauri build && node -e \"const fs = require('fs'); fs.copyFileSync('./src-tauri/target/release/bundle/nsis/MD Viewer_1.0.0_x64-setup.exe', './dist/MD Viewer Setup.exe'); fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\""
+    "build": "tauri build && node -e \"const fs = require('fs'); const path = require('path'); const nsisDir = './src-tauri/target/release/bundle/nsis'; const files = fs.readdirSync(nsisDir); const setupFile = files.find(f => f.endsWith('-setup.exe')); if (setupFile) { fs.copyFileSync(path.join(nsisDir, setupFile), './dist/MD Viewer Setup.exe'); } fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\"",
+    "dist": "tauri build && node -e \"const fs = require('fs'); const path = require('path'); const nsisDir = './src-tauri/target/release/bundle/nsis'; const files = fs.readdirSync(nsisDir); const setupFile = files.find(f => f.endsWith('-setup.exe')); if (setupFile) { fs.copyFileSync(path.join(nsisDir, setupFile), './dist/MD Viewer Setup.exe'); } fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\""
   },
   "author": "wassupbro",
   "license": "MIT",

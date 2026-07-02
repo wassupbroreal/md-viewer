@@ -189,7 +189,7 @@ html, body {
 
 .sidebar-top {
   height: var(--toolbar-h); /* match main toolbar height (38px) */
-  padding: 5px; /* 5px margins on top, bottom, and left */
+  padding: 0; /* no margins */
   flex-shrink: 0;
   border-bottom: 1px solid var(--border); /* elegant divider line */
   background: var(--bg-surface); /* completely white background to match toolbar */
@@ -199,16 +199,16 @@ html, body {
 }
 
 .btn-open {
-  height: 100%; /* fills the 28px content area */
+  height: 100%; /* fills the 38px content area */
   width: auto; /* fit-content width, moved to the left */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
+  padding: 0 12px;
   background: transparent; /* transparent by default */
   color: var(--text-2);
   border: none;
-  border-radius: var(--r-sm); /* rounded corner styling like search button */
+  border-radius: 0; /* square edges for edgeless button layout */
   font-family: var(--font);
   font-size: 13px;
   font-weight: 500;
@@ -224,7 +224,7 @@ html, body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 4px 6px 8px;
+  padding: 0; /* no padding to stretch files list */
   min-height: 0;
   border-right: 1px solid var(--border); /* keep border only in the body section */
 }
@@ -259,34 +259,49 @@ html, body {
 .ri {
   display: flex;
   align-items: center;
-  padding: 6px 6px 6px 8px; /* normal clean padding, no shifts */
-  border-radius: var(--r-sm);
+  height: 38px; /* match toolbar height (38px) for grid consistency */
+  padding: 0; /* no padding to fill container */
+  margin-bottom: 0; /* no margin between items */
+  border-radius: 0; /* square tile edges */
   transition: background-color var(--t);
   min-width: 0;
-  margin-bottom: 4px; /* More distance between items */
   cursor: pointer; /* Clickable everywhere */
+  box-sizing: border-box;
 }
 .ri:hover, .ri.active { background-color: var(--bg-hover); } /* same highlight on hover/active, no border */
 .ri.missing { opacity: .4; pointer-events: none; cursor: default; }
 
 .ri-body {
   display: flex;
-  align-items: flex-start; /* align to top since path is below filename */
-  gap: 8px;
+  align-items: center; /* center text elements vertically */
+  gap: 10px;
   flex: 1;
+  height: 100%;
   min-width: 0;
 }
-.ri-icon { color: var(--text-3); flex-shrink: 0; display: flex; align-items: center; margin-top: 2px; }
-.ri-text { min-width: 0; }
-.ri-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 138px; line-height: 1.2; color: var(--text); }
-.ri-dir  { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 138px; margin-top: 1px; }
+.ri-icon {
+  width: 38px; height: 100%; /* make icon container a perfect square of 38px */
+  color: var(--text-3);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ri-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.ri-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 155px; line-height: 1.2; color: var(--text); }
+.ri-dir  { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 155px; margin-top: 1px; }
 
 /* Remove button */
 .ri-rm {
   flex-shrink: 0;
-  width: 22px;  /* Larger close button */
-  height: 22px; /* Larger close button */
-  border: none; border-radius: 3px;
+  width: 30px;  /* Square close button */
+  height: 100%; /* fills entire item height (38px) */
+  border: none; border-radius: 0; /* square edges */
   background: transparent; color: var(--text-3);
   font-size: 15px; /* Larger close icon */
   line-height: 1;
@@ -294,7 +309,7 @@ html, body {
   display: flex; align-items: center; justify-content: center;
   opacity: 0;
   transition: opacity var(--t), background var(--t), color var(--t);
-  margin-left: 4px;
+  margin-left: auto;
 }
 .ri:hover .ri-rm { opacity: 1; }
 .ri-rm:hover     { background: var(--bg-active); color: var(--text); }
@@ -311,21 +326,21 @@ html, body {
   background: var(--bg-surface);
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 5px;
+  gap: 0; /* no gap between items */
+  padding: 0; /* no padding */
   flex-shrink: 0;
 }
-.toolbar-path { flex: 1; font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
+.toolbar-path { flex: 1; font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px; }
 .path-hint { color: var(--text-3); }
 .path-dir  { color: var(--text-3); }
 .path-name { color: var(--text); font-weight: 500; }
-.toolbar-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.file-meta { font-size: 11px; color: var(--text-3); padding-left: 4px; }
+.toolbar-right { display: flex; align-items: center; gap: 0; flex-shrink: 0; height: 100%; }
+.file-meta { font-size: 11px; color: var(--text-3); padding: 0 8px; }
 
 /* Icon button */
 .icon-btn {
-  width: 28px; height: 28px;
-  border: none; border-radius: var(--r-sm);
+  width: 38px; height: 100%; /* fill entire toolbar height (38px) */
+  border: none; border-radius: 0; /* square tile edges */
   background: transparent; color: var(--text-2);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
