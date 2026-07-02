@@ -15,6 +15,7 @@
   --bg-titlebar:  #efefef;
   --bg-input:     #eeeeee;
   --bg-input-focus: #e5e5e5;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d5d5d' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
   --text:         #202020;
   --text-2:       #5d5d5d;
@@ -54,6 +55,7 @@
   --bg-titlebar:  #202020;
   --bg-input:     #121212;
   --bg-input-focus: #181818;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
   --text:         #f3f3f3;
   --text-2:       #cccccc;
@@ -679,19 +681,30 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   color: var(--text-2);
 }
 .setting-item select {
-  padding: 5px 8px;
+  padding: 5px 28px 5px 8px; /* right padding 28px for arrow spacing */
   border-radius: var(--r-sm);
   border: 1px solid var(--border);
-  background: var(--bg-surface);
+  background-color: var(--bg-input);
+  background-image: var(--select-arrow);
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 11px 11px; /* elegant small chevron size */
   color: var(--text);
   font-family: var(--font);
   font-size: 12px;
   outline: none;
   cursor: pointer;
-  transition: border-color var(--t);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none; /* remove default arrow */
+  transition: border-color var(--t), background-color var(--t);
 }
 .setting-item select:hover {
   border-color: var(--text-3);
+}
+.setting-item select:focus {
+  border-color: var(--text-2);
+  background-color: var(--bg-input-focus);
 }
 .checkbox-label {
   display: flex;
