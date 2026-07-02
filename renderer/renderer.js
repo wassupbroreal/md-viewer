@@ -107,7 +107,7 @@ setTimeout(async () => {
   if (!invoke || !dialog) return;
   try {
     const currentVersion = await invoke('get_app_version');
-    const res = await fetch('https://api.github.com/repos/wassupbro/md-viewer/releases/latest', {
+    const res = await fetch('https://api.github.com/repos/wassupbroreal/md-viewer/releases/latest', {
       headers: { 'User-Agent': 'Tauri-MD-Viewer-Updater' }
     });
     if (res.status !== 200) return;
@@ -116,12 +116,13 @@ setTimeout(async () => {
 
     const latestVersion = release.tag_name.replace(/^v/, '');
     if (isNewerVersion(latestVersion, currentVersion)) {
+      const dict = i18n[settings.lang || 'en'];
       const confirm = await dialog.ask(
-        `Доступна новая версия ${release.tag_name}!\n\nТекущая версия: v${currentVersion}\nНовая версия: ${release.tag_name}\n\nХотите открыть страницу загрузки в браузере?`,
+        dict.updateMsg(release.tag_name, currentVersion),
         {
-          title: 'Доступно обновление',
-          okLabel: 'Скачать',
-          cancelLabel: 'Позже'
+          title: dict.updateTitle,
+          okLabel: dict.updateOk,
+          cancelLabel: dict.updateCancel
         }
       );
       if (confirm) {
@@ -479,7 +480,11 @@ const i18n = {
     optFamilyMono: 'Monospace (JetBrains)',
     optFamilySerif: 'Serif (Georgia)',
     optThemeLight: 'Light',
-    optThemeDark: 'Dark'
+    optThemeDark: 'Dark',
+    updateTitle: 'Update Available',
+    updateOk: 'Download',
+    updateCancel: 'Later',
+    updateMsg: (tag, current) => `New version ${tag} is available!\n\nCurrent version: v${current}\nNew version: ${tag}\n\nDo you want to open the download page in your browser?`
   },
   ru: {
     openBtn: 'Открыть файл',
@@ -501,7 +506,11 @@ const i18n = {
     optFamilyMono: 'Моноширинный (JetBrains)',
     optFamilySerif: 'С засечками (Georgia)',
     optThemeLight: 'Светлая',
-    optThemeDark: 'Темная'
+    optThemeDark: 'Темная',
+    updateTitle: 'Доступно обновление',
+    updateOk: 'Скачать',
+    updateCancel: 'Позже',
+    updateMsg: (tag, current) => `Доступна новая версия ${tag}!\n\nТекущая версия: v${current}\nНовая версия: ${tag}\n\nХотите открыть страницу загрузки в браузере?`
   }
 };
 
