@@ -5,8 +5,8 @@
   "scripts": {
     "tauri": "tauri",
     "start": "tauri dev",
-    "build": "tauri build && node -e \"const fs = require('fs'); const path = require('path'); const nsisDir = './src-tauri/target/release/bundle/nsis'; const files = fs.readdirSync(nsisDir); const setupFile = files.find(f => f.endsWith('-setup.exe')); if (setupFile) { fs.copyFileSync(path.join(nsisDir, setupFile), './dist/MD Viewer Setup.exe'); } fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\"",
-    "dist": "tauri build && node -e \"const fs = require('fs'); const path = require('path'); const nsisDir = './src-tauri/target/release/bundle/nsis'; const files = fs.readdirSync(nsisDir); const setupFile = files.find(f => f.endsWith('-setup.exe')); if (setupFile) { fs.copyFileSync(path.join(nsisDir, setupFile), './dist/MD Viewer Setup.exe'); } fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\""
+    "build": "tauri build && node -e \"const fs = require('fs'); const path = require('path'); const nsisDir = './src-tauri/target/release/bundle/nsis'; const files = fs.readdirSync(nsisDir).map(n => ({ n, t: fs.statSync(path.join(nsisDir, n)).mtime.getTime() })); files.sort((a, b) => b.t - a.t); const setup = files.find(f => f.n.endsWith('-setup.exe')); if (setup) { fs.copyFileSync(path.join(nsisDir, setup.n), './dist/MD Viewer Setup.exe'); } fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\"",
+    "dist": "tauri build && node -e \"const fs = require('fs'); const path = require('path'); const nsisDir = './src-tauri/target/release/bundle/nsis'; const files = fs.readdirSync(nsisDir).map(n => ({ n, t: fs.statSync(path.join(nsisDir, n)).mtime.getTime() })); files.sort((a, b) => b.t - a.t); const setup = files.find(f => f.n.endsWith('-setup.exe')); if (setup) { fs.copyFileSync(path.join(nsisDir, setup.n), './dist/MD Viewer Setup.exe'); } fs.copyFileSync('./src-tauri/target/release/app.exe', './dist/MD Viewer.exe')\""
   },
   "author": "wassupbro",
   "license": "MIT",
