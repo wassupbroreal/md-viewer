@@ -77,9 +77,14 @@
 *, *:focus, *:focus-visible { outline: none !important; }
 
 /* Prevent ANY text/icon selection everywhere (except markdown content) */
-body, button, input, span, div, aside, nav, header, ul, li, p, a {
+* {
   user-select: none;
   -webkit-user-select: none;
+}
+
+input, textarea, input *, textarea * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 
 /* Material Symbols */
@@ -467,8 +472,12 @@ html, body {
   font-size: 14px; line-height: 1.75;
   color: var(--text); word-break: break-word;
   /* Allow selecting text in the document */
-  user-select: text; -webkit-user-select: text;
+  user-select: text !important; -webkit-user-select: text !important;
   animation: fadeUp .2s ease;
+}
+.md * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 

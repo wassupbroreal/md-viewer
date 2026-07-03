@@ -83,15 +83,17 @@ function parseMarkdown(content) {
     .replace(
       /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
       (_, lang, code) => {
+        let highlighted = code;
         const decoded = code
           .replace(/&amp;/g, '&').replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-        let highlighted = decoded;
         try {
           highlighted = hljs.getLanguage(lang)
             ? hljs.highlight(decoded, { language: lang }).value
             : hljs.highlightAuto(decoded).value;
-        } catch { /* keep original */ }
+        } catch {
+          highlighted = code;
+        }
         return `<pre class="code-block" data-lang="${lang}"><code>${highlighted}</code></pre>`;
       }
     )
