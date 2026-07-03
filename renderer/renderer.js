@@ -167,6 +167,8 @@ const el = {
   searchInput: $('search-input'),
   searchCount: $('search-count'),
   dropOverlay: $('drop-overlay'),
+  outline:     $('outline'),
+  outlineList: $('outline-list'),
 };
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
@@ -184,6 +186,7 @@ setupDrop();
 window.api.onLoading(() => showSpinner());
 window.api.onFile((data)  => renderContent(data));
 window.api.onError((msg)  => { hideSpinner(); alert('Ошибка:\n' + msg); });
+el.viewport.addEventListener('scroll', syncOutlineScroll);
 
 // ── Title bar ─────────────────────────────────────────────────────────────────
 $('btn-min').addEventListener('click',   () => window.api.minimize());
@@ -304,6 +307,8 @@ function showWelcome() {
   el.fileMeta.textContent  = '';
   el.btnExplorer.style.display = 'none';
   if (searchOpen) closeSearch();
+  el.outline.style.display = 'none';
+  el.outlineList.innerHTML = '';
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -355,6 +360,7 @@ function renderContent(data) {
     updateAllCodeBlocksLineNumbers();
   }
   if (searchOpen && el.searchInput.value) doSearch(el.searchInput.value);
+  generateOutline();
 }
 
 // ── Recent files ──────────────────────────────────────────────────────────────
@@ -629,3 +635,103 @@ function applySettings() {
 
 // Call initSettings on boot
 initSettings();
+
+// ── Outline Panel (Table of Contents) ──────────────────────────────────────────
+function generateOutline() {
+  el.outlineList.innerHTML = '';
+  const headings = el.mdOut.querySelectorAll('h1, h2, h3');
+  
+  if (!headings.length) {
+    el.outline.style.display = 'none';
+    return;
+  }
+
+  const ids = new Set();
+  headings.forEach((heading, idx) => {
+    let id = heading.id;
+    if (!id) {
+      const text = heading.textContent.trim().toLowerCase()
+        .replace(/[^\w\sа-яё\-]/gi, '')
+        .replace(/\s+/g, '-');
+      id = text || 'heading-' + idx;
+      
+      let uniqueId = id;
+      let count = 1;
+      while (ids.has(uniqueId)) {
+        uniqueId = id + '-' + count;
+        count++;
+      }
+      id = uniqueId;
+      heading.id = id;
+    }
+    ids.add(id);
+
+    const li = document.createElement('li');
+    li.className = 'outline-item ' + heading.tagName.toLowerCase();
+    li.textContent = heading.textContent.trim();
+    li.title = heading.textContent.trim();
+    
+    li.onclick = () => {
+      heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      const items = el.outlineList.querySelectorAll('.outline-item');
+      items.forEach(item => item.classList.remove('active'));
+      li.classList.add('active');
+    };
+
+    el.outlineList.appendChild(li);
+  });
+
+  el.outline.style.display = 'flex';
+  syncOutlineScroll();
+}
+
+function syncOutlineScroll() {
+  const headings = Array.from(el.mdOut.querySelectorAll('h1, h2, h3'));
+  if (!headings.length) return;
+
+  const viewportRect = el.viewport.getBoundingClientRect();
+  const threshold = 80;
+
+  let activeHeading = null;
+
+  for (let i = 0; i < headings.length; i++) {
+    const heading = headings[i];
+    const rect = heading.getBoundingClientRect();
+    const relativeTop = rect.top - viewportRect.top;
+
+    if (relativeTop <= threshold) {
+      activeHeading = heading;
+    } else {
+      break;
+    }
+  }
+
+  if (!activeHeading && headings.length > 0) {
+    activeHeading = headings[0];
+  }
+
+  const items = el.outlineList.querySelectorAll('.outline-item');
+  items.forEach((item, idx) => {
+    const heading = headings[idx];
+    if (heading === activeHeading) {
+      item.classList.add('active');
+      
+      const outlineBody = el.outline.querySelector('.outline-body');
+      if (outlineBody) {
+        const itemTop = item.offsetTop;
+        const itemHeight = item.offsetHeight;
+        const containerHeight = outlineBody.clientHeight;
+        const containerScrollTop = outlineBody.scrollTop;
+
+        if (itemTop < containerScrollTop) {
+          outlineBody.scrollTop = itemTop - 10;
+        } else if (itemTop + itemHeight > containerScrollTop + containerHeight) {
+          outlineBody.scrollTop = itemTop + itemHeight - containerHeight + 10;
+        }
+      }
+    } else {
+      item.classList.remove('active');
+    }
+  });
+}

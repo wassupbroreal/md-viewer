@@ -732,6 +732,77 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
 }
 
 /* ================================================
+   OUTLINE (TABLE OF CONTENTS)
+   ================================================ */
+.pane-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.outline {
+  width: 220px;
+  min-width: 220px;
+  background: var(--bg-sidebar);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.outline-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  padding: 10px 0;
+}
+.outline-body::-webkit-scrollbar { width: 6px; }
+.outline-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.outline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.outline-item {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  cursor: pointer;
+  transition: background-color var(--t), color var(--t);
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.outline-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text);
+}
+.outline-item.active {
+  background-color: var(--bg-active);
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Hierarchy indents */
+.outline-item.h1 { font-weight: 600; }
+.outline-item.h2 { padding-left: 24px; }
+.outline-item.h3 { padding-left: 36px; color: var(--text-3); }
+.outline-item.h3:hover, .outline-item.h3.active { color: var(--text); }
+
+/* ================================================
    PRINT
    ================================================ */
 @media print {
