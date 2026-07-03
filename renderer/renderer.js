@@ -77,9 +77,59 @@ if (listen) {
 }
 
 function parseMarkdown(content) {
+  const mathBlocks = [];
+
+  // Replace display math and inline math with placeholders before Markdown parsing
+  let processed = content
+    // Display Math $$ ... $$
+    .replace(/\$\$([\s\S]+?)\$\$/g, (match, eq) => {
+      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      try {
+        const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
+        mathBlocks.push({ id, html: rendered });
+      } catch {
+        mathBlocks.push({ id, html: match });
+      }
+      return id;
+    })
+    // Display Math \[ ... \]
+    .replace(/\\\[([\s\S]+?)\\\]/g, (match, eq) => {
+      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      try {
+        const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
+        mathBlocks.push({ id, html: rendered });
+      } catch {
+        mathBlocks.push({ id, html: match });
+      }
+      return id;
+    })
+    // Display Math (( ... )) or \(( ... )) or \(( ... )\)
+    .replace(/\\?\(\(([\s\S]+?)\\?\)\)/g, (match, eq) => {
+      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      try {
+        const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
+        mathBlocks.push({ id, html: rendered });
+      } catch {
+        mathBlocks.push({ id, html: match });
+      }
+      return id;
+    })
+    // Inline Math $ ... $ (safe check to avoid plain currency symbols)
+    .replace(/\$([^\$\s](?:[^\$]*?[^\$\s])?)\$/g, (match, eq) => {
+      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      try {
+        const rendered = katex.renderToString(eq.trim(), { displayMode: false, throwOnError: false });
+        mathBlocks.push({ id, html: rendered });
+      } catch {
+        mathBlocks.push({ id, html: match });
+      }
+      return id;
+    });
+
   marked.use({ async: false, gfm: true, breaks: true });
-  const rawHtml = String(marked.parse(content));
-  const html = rawHtml
+  const rawHtml = String(marked.parse(processed));
+
+  let html = rawHtml
     .replace(
       /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
       (_, lang, code) => {
@@ -101,6 +151,12 @@ function parseMarkdown(content) {
       /<pre><code>([\s\S]*?)<\/code><\/pre>/g,
       '<pre class="code-block"><code>$1</code></pre>'
     );
+
+  // Restore math placeholders
+  mathBlocks.forEach(block => {
+    html = html.split(block.id).join(block.html);
+  });
+
   return html;
 }
 
