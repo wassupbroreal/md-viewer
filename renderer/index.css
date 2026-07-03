@@ -245,8 +245,11 @@ html, body {
   overflow-y: auto;
   overscroll-behavior: none;
   flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.recent::-webkit-scrollbar {
+  display: none;
 }
 .recent-empty {
   font-size: 12px;
@@ -411,10 +414,12 @@ html, body {
 .viewport {
   flex: 1; overflow-y: auto; overflow-x: hidden;
   overscroll-behavior: none;
-  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.viewport::-webkit-scrollbar { width: 6px; }
-.viewport::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.viewport::-webkit-scrollbar {
+  display: none;
+}
 
 /* Spinner */
 .spinner-wrap {
@@ -757,12 +762,13 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: none;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-  padding: 10px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0;
 }
-.outline-body::-webkit-scrollbar { width: 6px; }
-.outline-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.outline-body::-webkit-scrollbar {
+  display: none;
+}
 
 .outline-list {
   list-style: none;
@@ -793,7 +799,6 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
 .outline-item.active {
   background-color: var(--bg-active);
   color: var(--text);
-  font-weight: 500;
 }
 
 /* ================================================
