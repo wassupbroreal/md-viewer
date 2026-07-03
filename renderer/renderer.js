@@ -639,7 +639,7 @@ initSettings();
 // ── Outline Panel (Table of Contents) ──────────────────────────────────────────
 function generateOutline() {
   el.outlineList.innerHTML = '';
-  const headings = el.mdOut.querySelectorAll('h1, h2, h3');
+  const headings = el.mdOut.querySelectorAll('h1');
   
   if (!headings.length) {
     el.outline.style.display = 'none';
@@ -687,7 +687,7 @@ function generateOutline() {
 }
 
 function syncOutlineScroll() {
-  const headings = Array.from(el.mdOut.querySelectorAll('h1, h2, h3'));
+  const headings = Array.from(el.mdOut.querySelectorAll('h1'));
   if (!headings.length) return;
 
   const viewportRect = el.viewport.getBoundingClientRect();

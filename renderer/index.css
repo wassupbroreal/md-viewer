@@ -743,8 +743,8 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
 }
 
 .outline {
-  width: 220px;
-  min-width: 220px;
+  width: 260px;
+  min-width: 260px;
   background: var(--bg-sidebar);
   border-left: 1px solid var(--border);
   display: flex;
