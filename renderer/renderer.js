@@ -149,6 +149,8 @@ let currentFilePath = null;
 let searchMatches   = [];
 let searchIdx       = -1;
 let searchOpen      = false;
+let isProgrammaticScrolling = false;
+let scrollTimeout   = null;
 
 // ── DOM ──────────────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
@@ -672,11 +674,18 @@ function generateOutline() {
     li.title = heading.textContent.trim();
     
     li.onclick = () => {
+      isProgrammaticScrolling = true;
       heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
       
       const items = el.outlineList.querySelectorAll('.outline-item');
       items.forEach(item => item.classList.remove('active'));
       li.classList.add('active');
+
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isProgrammaticScrolling = false;
+        syncOutlineScroll();
+      }, 600);
     };
 
     el.outlineList.appendChild(li);
@@ -687,6 +696,7 @@ function generateOutline() {
 }
 
 function syncOutlineScroll() {
+  if (isProgrammaticScrolling) return;
   const headings = Array.from(el.mdOut.querySelectorAll('h2'));
   if (!headings.length) return;
 
