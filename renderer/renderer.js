@@ -83,7 +83,7 @@ function parseMarkdown(content) {
   let processed = content
     // Display Math $$ ... $$
     .replace(/\$\$([\s\S]+?)\$\$/g, (match, eq) => {
-      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
       try {
         const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
@@ -94,7 +94,7 @@ function parseMarkdown(content) {
     })
     // Display Math \[ ... \]
     .replace(/\\\[([\s\S]+?)\\\]/g, (match, eq) => {
-      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
       try {
         const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
@@ -105,7 +105,7 @@ function parseMarkdown(content) {
     })
     // Display Math (( ... )) or \(( ... )) or \(( ... )\)
     .replace(/\\?\(\(([\s\S]+?)\\?\)\)/g, (match, eq) => {
-      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
       try {
         const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
@@ -116,7 +116,7 @@ function parseMarkdown(content) {
     })
     // Inline Math $ ... $ (safe check to avoid plain currency symbols)
     .replace(/\$([^\$\s](?:[^\$]*?[^\$\s])?)\$/g, (match, eq) => {
-      const id = `___MATH_BLOCK_${mathBlocks.length}___`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
       try {
         const rendered = katex.renderToString(eq.trim(), { displayMode: false, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
