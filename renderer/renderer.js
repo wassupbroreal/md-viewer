@@ -77,73 +77,9 @@ if (listen) {
 }
 
 function parseMarkdown(content) {
-  const mathBlocks = [];
-
-  // Replace display math and inline math with placeholders before Markdown parsing
-  let processed = content
-    // Display Math $$ ... $$
-    .replace(/\$\$([\s\S]+?)\$\$/g, (match, eq) => {
-      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
-      try {
-        const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
-        mathBlocks.push({ id, html: rendered });
-      } catch {
-        mathBlocks.push({ id, html: match });
-      }
-      return id;
-    })
-    // Display Math \[ ... \]
-    .replace(/\\\[([\s\S]+?)\\\]/g, (match, eq) => {
-      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
-      try {
-        const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
-        mathBlocks.push({ id, html: rendered });
-      } catch {
-        mathBlocks.push({ id, html: match });
-      }
-      return id;
-    })
-    // Inline Math (( ... )) or \(( ... )) or \(( ... )\)
-    .replace(/\\?\(\(([\s\S]+?)\\?\)\)/g, (match, eq) => {
-      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
-      try {
-        const rendered = katex.renderToString(eq.trim(), { displayMode: false, throwOnError: false });
-        mathBlocks.push({ id, html: rendered });
-      } catch {
-        mathBlocks.push({ id, html: match });
-      }
-      return id;
-    })
-    // Inline Math $ ... $ (safe check to avoid plain currency symbols)
-    .replace(/\$([^\$\s](?:[^\$]*?[^\$\s])?)\$/g, (match, eq) => {
-      const trimmed = eq.trim();
-      // Normalize common LaTeX formatters to plain text equivalents
-      const normalized = trimmed
-        .replace(/\\,/g, ' ')               // replace thin space \, with space
-        .replace(/\\text\{--\}/g, '–')       // replace \text{--} with en-dash
-        .replace(/\\text\{-\}/g, '-')        // replace \text{-} with hyphen
-        .replace(/\\%/g, '%')                // replace \% with %
-        .replace(/\\sim/g, '~')              // replace \sim with ~
-        .replace(/\\approx/g, '≈');          // replace \approx with ≈
-
-      // If it is just a plain number/percentage/range/approx, keep it as normal text (no KaTeX serif fonts)
-      if (/^[0-9\s,\.%\-\u2013\u2014~≈]+$/.test(normalized.trim())) {
-        return normalized.trim();
-      }
-      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
-      try {
-        const rendered = katex.renderToString(trimmed, { displayMode: false, throwOnError: false });
-        mathBlocks.push({ id, html: rendered });
-      } catch {
-        mathBlocks.push({ id, html: match });
-      }
-      return id;
-    });
-
   marked.use({ async: false, gfm: true, breaks: true });
-  const rawHtml = String(marked.parse(processed));
-
-  let html = rawHtml
+  const rawHtml = String(marked.parse(content));
+  const html = rawHtml
     .replace(
       /<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g,
       (_, lang, code) => {
@@ -165,12 +101,6 @@ function parseMarkdown(content) {
       /<pre><code>([\s\S]*?)<\/code><\/pre>/g,
       '<pre class="code-block"><code>$1</code></pre>'
     );
-
-  // Restore math placeholders
-  mathBlocks.forEach(block => {
-    html = html.split(block.id).join(block.html);
-  });
-
   return html;
 }
 
