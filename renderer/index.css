@@ -818,4 +818,19 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   .md { max-width: none; padding: 0; animation: none; }
 }
 
+/* ================================================
+   KATEX CUSTOM FONT OVERRIDES
+   ================================================ */
+.katex,
+.katex * {
+  font-family: var(--font) !important;
+}
+.katex {
+  font-size: 1em !important;
+  line-height: 1.2 !important;
+}
+.katex-display {
+  margin: 1.2em 0 !important;
+}
+
 
