@@ -117,9 +117,18 @@ function parseMarkdown(content) {
     // Inline Math $ ... $ (safe check to avoid plain currency symbols)
     .replace(/\$([^\$\s](?:[^\$]*?[^\$\s])?)\$/g, (match, eq) => {
       const trimmed = eq.trim();
-      // If it is just a plain number/percentage/range, keep it as normal text (no KaTeX serif fonts)
-      if (/^[0-9\s,\.%\-\u2013\u2014]+$/.test(trimmed)) {
-        return trimmed;
+      // Normalize common LaTeX formatters to plain text equivalents
+      const normalized = trimmed
+        .replace(/\\,/g, ' ')               // replace thin space \, with space
+        .replace(/\\text\{--\}/g, '–')       // replace \text{--} with en-dash
+        .replace(/\\text\{-\}/g, '-')        // replace \text{-} with hyphen
+        .replace(/\\%/g, '%')                // replace \% with %
+        .replace(/\\sim/g, '~')              // replace \sim with ~
+        .replace(/\\approx/g, '≈');          // replace \approx with ≈
+
+      // If it is just a plain number/percentage/range/approx, keep it as normal text (no KaTeX serif fonts)
+      if (/^[0-9\s,\.%\-\u2013\u2014~≈]+$/.test(normalized.trim())) {
+        return normalized.trim();
       }
       const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
       try {
