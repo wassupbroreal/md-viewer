@@ -32,7 +32,7 @@
   --r:            5px;
   --r-sm:         3px;
   --r-input:      5px;
-  --sidebar-w:    220px;
+  --sidebar-w:    180px;
   --tbar-h:       31px;
   --toolbar-h:    38px;
   --footer-h:     28px;
@@ -287,8 +287,8 @@ html, body {
   flex-direction: column;
   justify-content: center;
 }
-.ri-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; line-height: 1.2; color: var(--text); }
-.ri-dir  { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; margin-top: 1px; }
+.ri-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; line-height: 1.2; color: var(--text); }
+.ri-dir  { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; margin-top: 1px; }
 
 /* Remove button */
 .ri-rm {
@@ -773,16 +773,16 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
 .outline-item {
   display: flex;
   align-items: center;
-  height: 30px;
-  padding: 0 12px;
+  min-height: 30px;
+  height: auto;
+  padding: 6px 12px;
   cursor: pointer;
   transition: background-color var(--t), color var(--t);
   font-family: var(--font);
   font-size: 12px;
   color: var(--text-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -795,12 +795,6 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   color: var(--text);
   font-weight: 500;
 }
-
-/* Hierarchy indents */
-.outline-item.h1 { font-weight: 600; }
-.outline-item.h2 { padding-left: 24px; }
-.outline-item.h3 { padding-left: 36px; color: var(--text-3); }
-.outline-item.h3:hover, .outline-item.h3.active { color: var(--text); }
 
 /* ================================================
    PRINT
