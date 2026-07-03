@@ -116,9 +116,14 @@ function parseMarkdown(content) {
     })
     // Inline Math $ ... $ (safe check to avoid plain currency symbols)
     .replace(/\$([^\$\s](?:[^\$]*?[^\$\s])?)\$/g, (match, eq) => {
+      const trimmed = eq.trim();
+      // If it is just a plain number/percentage, keep it as normal text (no KaTeX serif fonts)
+      if (/^[0-9\s,\.%]+$/.test(trimmed)) {
+        return trimmed;
+      }
       const id = `MATHPLACEHOLDER${mathBlocks.length}`;
       try {
-        const rendered = katex.renderToString(eq.trim(), { displayMode: false, throwOnError: false });
+        const rendered = katex.renderToString(trimmed, { displayMode: false, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
       } catch {
         mathBlocks.push({ id, html: match });
