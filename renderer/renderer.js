@@ -675,7 +675,7 @@ function generateOutline() {
     
     li.onclick = () => {
       isProgrammaticScrolling = true;
-      heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      heading.scrollIntoView({ block: 'start' });
       
       const items = el.outlineList.querySelectorAll('.outline-item');
       items.forEach(item => item.classList.remove('active'));
@@ -685,7 +685,7 @@ function generateOutline() {
       scrollTimeout = setTimeout(() => {
         isProgrammaticScrolling = false;
         syncOutlineScroll();
-      }, 600);
+      }, 100);
     };
 
     el.outlineList.appendChild(li);
