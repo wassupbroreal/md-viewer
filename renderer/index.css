@@ -273,8 +273,8 @@ html, body {
   cursor: pointer; /* Clickable everywhere */
   box-sizing: border-box;
 }
-.ri:hover, .ri.active { background-color: var(--bg-hover); } /* same highlight on hover/active, no border */
-.ri.missing { opacity: .4; pointer-events: none; cursor: default; }
+.ri:not(.missing):hover, .ri.active { background-color: var(--bg-hover); } /* same highlight on hover/active, no border */
+.ri.missing { opacity: .4; cursor: default; }
 
 .ri-body {
   display: flex;
