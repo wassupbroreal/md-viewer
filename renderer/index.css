@@ -32,7 +32,7 @@
   --r:            5px;
   --r-sm:         3px;
   --r-input:      5px;
-  --sidebar-w:    180px;
+  --sidebar-w:    260px;
   --tbar-h:       31px;
   --toolbar-h:    38px;
   --footer-h:     28px;
@@ -295,8 +295,8 @@ html, body {
   flex-direction: column;
   justify-content: center;
 }
-.ri-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; line-height: 1.2; color: var(--text); }
-.ri-dir  { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; margin-top: 1px; }
+.ri-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; line-height: 1.2; color: var(--text); }
+.ri-dir  { font-size: 10px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; margin-top: 1px; }
 
 /* Remove button */
 .ri-rm {
