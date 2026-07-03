@@ -83,7 +83,7 @@ function parseMarkdown(content) {
   let processed = content
     // Display Math $$ ... $$
     .replace(/\$\$([\s\S]+?)\$\$/g, (match, eq) => {
-      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
       try {
         const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
@@ -94,7 +94,7 @@ function parseMarkdown(content) {
     })
     // Display Math \[ ... \]
     .replace(/\\\[([\s\S]+?)\\\]/g, (match, eq) => {
-      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
       try {
         const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
@@ -103,11 +103,11 @@ function parseMarkdown(content) {
       }
       return id;
     })
-    // Display Math (( ... )) or \(( ... )) or \(( ... )\)
+    // Inline Math (( ... )) or \(( ... )) or \(( ... )\)
     .replace(/\\?\(\(([\s\S]+?)\\?\)\)/g, (match, eq) => {
-      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
       try {
-        const rendered = katex.renderToString(eq.trim(), { displayMode: true, throwOnError: false });
+        const rendered = katex.renderToString(eq.trim(), { displayMode: false, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
       } catch {
         mathBlocks.push({ id, html: match });
@@ -117,11 +117,11 @@ function parseMarkdown(content) {
     // Inline Math $ ... $ (safe check to avoid plain currency symbols)
     .replace(/\$([^\$\s](?:[^\$]*?[^\$\s])?)\$/g, (match, eq) => {
       const trimmed = eq.trim();
-      // If it is just a plain number/percentage, keep it as normal text (no KaTeX serif fonts)
-      if (/^[0-9\s,\.%]+$/.test(trimmed)) {
+      // If it is just a plain number/percentage/range, keep it as normal text (no KaTeX serif fonts)
+      if (/^[0-9\s,\.%\-\u2013\u2014]+$/.test(trimmed)) {
         return trimmed;
       }
-      const id = `MATHPLACEHOLDER${mathBlocks.length}`;
+      const id = `MATHPLACEHOLDER${mathBlocks.length}X`;
       try {
         const rendered = katex.renderToString(trimmed, { displayMode: false, throwOnError: false });
         mathBlocks.push({ id, html: rendered });
