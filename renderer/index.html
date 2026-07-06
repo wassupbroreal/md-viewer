@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self';" />
+  <title>MD Viewer</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" />
+  <link rel="stylesheet" href="katex.min.css" />
+  <link rel="stylesheet" href="index.css" />
+  <link rel="icon" type="image/png" href="icon.png" />
+</head>
+<body>
+
+  <!-- Splash screen — hides FOUC, fades out after 500ms -->
+  <div id="splash">
+    <div class="splash-ring"></div>
+  </div>
+
+  <!-- Title bar -->
+  <header class="titlebar">
+    <!-- App name — always left -->
+    <span class="tb-app">MD Viewer</span>
+    <button id="btn-settings" class="wbtn" title="Настройки" aria-label="Настройки">Настройки</button>
+    <!-- Drag spacer left -->
+    <div class="tb-drag"></div>
+    <!-- File name — always center -->
+    <span class="tb-file" id="win-title"></span>
+    <!-- Drag spacer right -->
+    <div class="tb-drag"></div>
+    <!-- Window control buttons -->
+    <div class="titlebar-btns">
+      <button id="btn-min"   class="wbtn"           aria-label="Свернуть">
+        <svg width="10" height="1"><rect width="10" height="1" fill="currentColor"/></svg>
+      </button>
+      <button id="btn-max"   class="wbtn"           aria-label="Развернуть">
+        <svg width="10" height="10"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="currentColor"/></svg>
+      </button>
+      <button id="btn-close" class="wbtn wbtn-close" aria-label="Закрыть">
+        <svg width="10" height="10"><path d="M0 0l10 10M10 0L0 10" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Workspace containing sidebar and content pane horizontally -->
+      <!-- Content pane -->
+      <div class="pane">
+        <!-- Pane Content Area (Viewport) -->
+        <div class="pane-content">
+          <!-- Viewport -->
+          <div class="viewport" id="viewport">
+
+            <!-- Loading spinner (hidden by default via style) -->
+            <div class="spinner-wrap" id="spinner" style="display:none">
+              <div class="spinner"></div>
+            </div>
+
+            <!-- Welcome -->
+            <div class="welcome" id="welcome">
+              <div class="welcome-icon">
+                <svg width="36" height="36" viewBox="0 0 16 16" fill="none">
+                  <path d="M2.5 1h8L14 4.5V15a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 2 15V1.5A.5.5 0 0 1 2.5 1z" stroke="currentColor" stroke-linejoin="round"/>
+                  <path d="M10.5 1v3.5H14" stroke="currentColor" stroke-linejoin="round"/>
+                  <line x1="5" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-linecap="round"/>
+                  <line x1="5" y1="10"  x2="11" y2="10"  stroke="currentColor" stroke-linecap="round"/>
+                  <line x1="5" y1="12.5" x2="9" y2="12.5" stroke="currentColor" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h1>MD Viewer</h1>
+            </div>
+
+            <!-- Markdown output (hidden by default via style) -->
+            <article class="md" id="md-out" style="display:none"></article>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drop overlay -->
+  <div class="drop-overlay" id="drop-overlay" style="display:none"></div>
+
+  <!-- Modal Settings -->
+  <div class="modal-overlay" id="settings-modal" style="display:none">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="settings-title-text">Settings</h2>
+        <button class="icon-btn sm modal-close" id="btn-settings-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-item">
+          <label for="setting-font-size" id="label-font-size">Font Size:</label>
+          <select id="setting-font-size">
+            <option value="12px" id="opt-size-sm">12 px (Small)</option>
+            <option value="13px" id="opt-size-std">13 px (Standard)</option>
+            <option value="14px" id="opt-size-med">14 px (Medium)</option>
+            <option value="16px" id="opt-size-lg">16 px (Large)</option>
+            <option value="18px" id="opt-size-xl">18 px (Extra Large)</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="setting-font-family" id="label-font-family">Content Font:</label>
+          <select id="setting-font-family">
+            <option value="var(--font-inter)" id="opt-family-sans">Sans-serif (Inter)</option>
+            <option value="var(--font-mono)" id="opt-family-mono">Monospace (JetBrains)</option>
+            <option value="var(--font-serif)" id="opt-family-serif">Serif (Georgia)</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="setting-theme" id="label-theme">Theme:</label>
+          <select id="setting-theme">
+            <option value="light" id="opt-theme-light">Light</option>
+            <option value="dark" id="opt-theme-dark">Dark</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label for="setting-lang" id="label-lang">Language:</label>
+          <select id="setting-lang">
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="marked.min.js"></script>
+  <script src="highlight.min.js"></script>
+  <script src="katex.min.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

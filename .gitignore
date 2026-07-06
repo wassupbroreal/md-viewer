@@ -1,0 +1,27 @@
+# Dependency directories
+node_modules/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# OS metadata
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# App data generated during dev
+renderer/*.log
+C:\Users\wassupbro\AppData\Roaming\md-viewer\
+
+# Auto-save and backup files
+*~
+*.bak
+.DS_Store
+dist/
+out/
+task.md
+publish.ps1
+delete_releases.ps1
