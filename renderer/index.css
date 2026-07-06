@@ -301,8 +301,8 @@ html, body {
 /* Remove button */
 .ri-rm {
   flex-shrink: 0;
+  width: 40px; /* fixed width matching 40px height for square shapes */
   height: 100%; /* fills entire item height dynamically */
-  aspect-ratio: 1; /* keeps the close button perfectly square */
   border: none; border-radius: 0; /* square edges */
   background: transparent; color: var(--text-3);
   font-size: 18px; /* Larger close icon */
