@@ -334,9 +334,6 @@ async function loadRecent() {
   }
 
   files.forEach(f => {
-    const sep = f.path.includes('\\') ? '\\' : '/';
-    const dir = f.path.substring(0, f.path.lastIndexOf(sep));
-
     const li = document.createElement('li');
     li.className = ['ri',
       f.exists ? '' : 'missing',
@@ -348,7 +345,6 @@ async function loadRecent() {
     body.innerHTML =
       '<div class="ri-text">' +
         '<div class="ri-name">' + esc(f.name) + '</div>' +
-        '<div class="ri-dir">' + esc(dir) + '</div>' +
       '</div>';
 
     if (f.exists) {
