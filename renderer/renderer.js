@@ -519,7 +519,7 @@ const btnSettingsClose = $('btn-settings-close');
 // i18n Translations Dictionary
 const i18n = {
   en: {
-    openBtn: 'Open File',
+    openBtn: 'Open',
     recentEmpty: 'No recent files',
     pathHint: 'Select a file to view',
     searchPlaceholder: 'Search',
@@ -545,7 +545,7 @@ const i18n = {
     updateMsg: (tag, current) => `New version ${tag} is available!\n\nCurrent version: v${current}\nNew version: ${tag}\n\nDo you want to open the download page in your browser?`
   },
   ru: {
-    openBtn: 'Открыть файл',
+    openBtn: 'Открыть',
     recentEmpty: 'Нет недавних файлов',
     pathHint: 'Выберите файл для просмотра',
     searchPlaceholder: 'Поиск',
@@ -642,8 +642,8 @@ function applySettings() {
   // Apply language (translate all elements)
   const dict = i18n[settings.lang];
 
-  // Open File tooltip translation
-  $('btn-open').title = dict.openBtn;
+  // Open File button text translation
+  $('btn-open').textContent = dict.openBtn;
 
   // Recent list empty state
   loadRecent();
