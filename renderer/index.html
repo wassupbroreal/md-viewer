@@ -46,76 +46,78 @@
 
   <div class="layout">
 
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-body">
-        <ul class="recent" id="recent-list">
-          <li class="recent-empty">Нет недавних файлов</li>
-        </ul>
+    <!-- Toolbar is now at the top, full width -->
+    <div class="toolbar">
+      <button class="icon-btn" id="btn-toggle-sidebar" title="Свернуть боковую панель">
+        <span class="material-symbols-outlined">view_sidebar</span>
+      </button>
+      <div class="toolbar-search">
+        <div class="search-input-wrapper">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input id="search-input" type="text" placeholder="Search" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="search-nav" id="search-nav-controls">
+          <button class="icon-btn search-nav-btn" id="btn-s-prev" tabindex="-1" title="Предыдущее совпадение">
+            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_up</span>
+          </button>
+          <button class="icon-btn search-nav-btn" id="btn-s-next" tabindex="-1" title="Следующее совпадение">
+            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_down</span>
+          </button>
+          <span class="search-count" id="search-count"></span>
+        </div>
       </div>
-    </aside>
-
-    <!-- Content pane -->
-    <div class="pane">
-
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <button class="icon-btn" id="btn-toggle-sidebar" title="Свернуть боковую панель">
-          <span class="material-symbols-outlined">view_sidebar</span>
+      <div class="toolbar-right">
+        <span class="file-meta" id="file-meta"></span>
+        <button class="icon-btn" id="btn-explorer" style="display:none">
+          <span class="material-symbols-outlined">open_in_new</span>
         </button>
-        <div class="toolbar-search">
-          <div class="search-input-wrapper">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input id="search-input" type="text" placeholder="Search" autocomplete="off" spellcheck="false" />
-          </div>
-          <div class="search-nav" id="search-nav-controls">
-            <button class="icon-btn sm search-nav-btn" id="btn-s-prev" tabindex="-1" title="Предыдущее совпадение">
-              <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_up</span>
-            </button>
-            <button class="icon-btn sm search-nav-btn" id="btn-s-next" tabindex="-1" title="Следующее совпадение">
-              <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_down</span>
-            </button>
-            <span class="search-count" id="search-count"></span>
-          </div>
-        </div>
-        <div class="toolbar-right">
-          <span class="file-meta" id="file-meta"></span>
-          <button class="icon-btn" id="btn-explorer" style="display:none">
-            <span class="material-symbols-outlined">open_in_new</span>
-          </button>
-          <button class="icon-btn" id="btn-settings">
-            <span class="material-symbols-outlined">settings</span>
-          </button>
-        </div>
+        <button class="icon-btn" id="btn-settings">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
       </div>
+    </div>
 
-      <!-- Pane Content Area (Viewport) -->
-      <div class="pane-content">
-        <!-- Viewport -->
-        <div class="viewport" id="viewport">
+    <!-- Workspace containing sidebar and content pane horizontally -->
+    <div class="workspace">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-body">
+          <ul class="recent" id="recent-list">
+            <li class="recent-empty">Нет недавних файлов</li>
+          </ul>
+        </div>
+      </aside>
 
-          <!-- Loading spinner (hidden by default via style) -->
-          <div class="spinner-wrap" id="spinner" style="display:none">
-            <div class="spinner"></div>
-          </div>
+      <!-- Content pane -->
+      <div class="pane">
+        <!-- Pane Content Area (Viewport) -->
+        <div class="pane-content">
+          <!-- Viewport -->
+          <div class="viewport" id="viewport">
 
-          <!-- Welcome -->
-          <div class="welcome" id="welcome">
-            <div class="welcome-icon">
-              <svg width="36" height="36" viewBox="0 0 16 16" fill="none">
-                <path d="M2.5 1h8L14 4.5V15a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 2 15V1.5A.5.5 0 0 1 2.5 1z" stroke="currentColor" stroke-linejoin="round"/>
-                <path d="M10.5 1v3.5H14" stroke="currentColor" stroke-linejoin="round"/>
-                <line x1="5" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-linecap="round"/>
-                <line x1="5" y1="10"  x2="11" y2="10"  stroke="currentColor" stroke-linecap="round"/>
-                <line x1="5" y1="12.5" x2="9" y2="12.5" stroke="currentColor" stroke-linecap="round"/>
-              </svg>
+            <!-- Loading spinner (hidden by default via style) -->
+            <div class="spinner-wrap" id="spinner" style="display:none">
+              <div class="spinner"></div>
             </div>
-            <h1>MD Viewer</h1>
+
+            <!-- Welcome -->
+            <div class="welcome" id="welcome">
+              <div class="welcome-icon">
+                <svg width="36" height="36" viewBox="0 0 16 16" fill="none">
+                  <path d="M2.5 1h8L14 4.5V15a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 2 15V1.5A.5.5 0 0 1 2.5 1z" stroke="currentColor" stroke-linejoin="round"/>
+                  <path d="M10.5 1v3.5H14" stroke="currentColor" stroke-linejoin="round"/>
+                  <line x1="5" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-linecap="round"/>
+                  <line x1="5" y1="10"  x2="11" y2="10"  stroke="currentColor" stroke-linecap="round"/>
+                  <line x1="5" y1="12.5" x2="9" y2="12.5" stroke="currentColor" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h1>MD Viewer</h1>
+            </div>
+
+            <!-- Markdown output (hidden by default via style) -->
+            <article class="md" id="md-out" style="display:none"></article>
+
           </div>
-
-          <!-- Markdown output (hidden by default via style) -->
-          <article class="md" id="md-out" style="display:none"></article>
-
         </div>
       </div>
     </div>
