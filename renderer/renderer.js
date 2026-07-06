@@ -227,6 +227,10 @@ let scrollTimeout   = null;
 // ── DOM ──────────────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
 const el = {
+  welcome:     $('welcome'),
+  spinner:     $('spinner'),
+  mdOut:       $('md-out'),
+  viewport:    $('viewport'),
   winTitle:    $('win-title'),
   dropOverlay: $('drop-overlay'),
 };
