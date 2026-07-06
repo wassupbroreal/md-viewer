@@ -44,7 +44,7 @@
   --font-mono:    'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
   --font-serif:   'Georgia', 'Times New Roman', serif;
   --mono:         'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
-  --t:            0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --t:            0s;
 }
 
 :root.dark {
@@ -353,11 +353,9 @@ html, body {
   z-index: 10;
 }
 .icon-btn:hover  { background: var(--bg-hover); color: var(--text); }
-.icon-btn:active { background: var(--bg-active); }
 .icon-btn.sm { width: 24px; height: 24px; font-size: 12px; }
 
 .toolbar .icon-btn:hover  { background: var(--bg-hover-light) !important; }
-.toolbar .icon-btn:active { background: var(--bg-active-light) !important; }
 
 .search-input-wrapper {
   position: relative;
@@ -392,7 +390,7 @@ html, body {
   z-index: 1;
   height: 100%;
 }
-#search-input:focus { background: var(--bg-hover) !important; }
+#search-input:focus { background: var(--bg-titlebar) !important; }
 #search-input::placeholder { color: var(--text-3); }
 
 .search-nav {
@@ -603,7 +601,7 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeIn 0.12s ease-out;
+  animation: none !important;
 }
 .modal-card {
   width: 320px;
@@ -613,7 +611,7 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
-  animation: scaleIn 0.15s cubic-bezier(0.1, 0.9, 0.2, 1);
+  animation: none !important;
   overflow: hidden;
 }
 .modal-header {
