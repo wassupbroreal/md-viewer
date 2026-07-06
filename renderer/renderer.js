@@ -235,6 +235,10 @@ const el = {
   viewport:    $('viewport'),
   winTitle:    $('win-title'),
   dropOverlay: $('drop-overlay'),
+  searchInput: $('search-input'),
+  searchCount: $('search-count'),
+  searchPrev:  $('search-prev'),
+  searchNext:  $('search-next'),
 };
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
@@ -394,9 +398,87 @@ function setupDrop() {
   }
 }
 
+// ── Search ────────────────────────────────────────────────────────────────────
+function runSearch() {
+  // Clear previous highlights
+  el.mdOut.querySelectorAll('mark.sh').forEach(m => {
+    const parent = m.parentNode;
+    parent.replaceChild(document.createTextNode(m.textContent), m);
+    parent.normalize();
+  });
+  searchMatches = [];
+  searchIdx = -1;
+
+  const q = el.searchInput.value.trim();
+  if (!q || el.mdOut.style.display === 'none') {
+    el.searchCount.textContent = '';
+    return;
+  }
+
+  const walker = document.createTreeWalker(
+    el.mdOut,
+    NodeFilter.SHOW_TEXT,
+    { acceptNode: (n) => n.parentNode.nodeName !== 'SCRIPT' && n.parentNode.nodeName !== 'STYLE' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }
+  );
+
+  const regex = new RegExp(reEsc(q), 'gi');
+  const nodesToProcess = [];
+  let node;
+  while ((node = walker.nextNode())) nodesToProcess.push(node);
+
+  nodesToProcess.forEach(textNode => {
+    const text = textNode.textContent;
+    if (!regex.test(text)) return;
+    regex.lastIndex = 0;
+
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    while ((m = regex.exec(text)) !== null) {
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const mark = document.createElement('mark');
+      mark.className = 'sh';
+      mark.textContent = m[0];
+      searchMatches.push(mark);
+      frag.appendChild(mark);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    textNode.parentNode.replaceChild(frag, textNode);
+  });
+
+  if (searchMatches.length > 0) {
+    searchIdx = 0;
+    highlightCurrent();
+  }
+  el.searchCount.textContent = searchMatches.length > 0 ? `1 / ${searchMatches.length}` : '0';
+}
+
+function highlightCurrent() {
+  searchMatches.forEach((m, i) => m.classList.toggle('sh-cur', i === searchIdx));
+  if (searchMatches[searchIdx]) {
+    searchMatches[searchIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  el.searchCount.textContent = searchMatches.length > 0 ? `${searchIdx + 1} / ${searchMatches.length}` : '0';
+}
+
+function searchStep(dir) {
+  if (!searchMatches.length) return;
+  searchIdx = (searchIdx + dir + searchMatches.length) % searchMatches.length;
+  highlightCurrent();
+}
+
+el.searchInput.addEventListener('input', runSearch);
+el.searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); searchStep(e.shiftKey ? -1 : 1); }
+  if (e.key === 'Escape') { el.searchInput.value = ''; runSearch(); }
+});
+el.searchPrev.addEventListener('click', () => searchStep(-1));
+el.searchNext.addEventListener('click', () => searchStep(1));
+
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'o') { e.preventDefault(); window.api.openDialog(); }
+  if (e.ctrlKey && e.key === 'f') { e.preventDefault(); el.searchInput.focus(); el.searchInput.select(); }
 });
 
 // ── Utilities ─────────────────────────────────────────────────────────────────

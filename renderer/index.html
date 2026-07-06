@@ -60,6 +60,17 @@
 
       <!-- Content pane -->
       <div class="pane">
+        <!-- Search toolbar -->
+        <div class="toolbar" id="toolbar">
+          <input id="search-input" class="search-input" type="text" placeholder="Поиск..." autocomplete="off" spellcheck="false" />
+          <span class="search-count" id="search-count"></span>
+          <button class="toolbar-btn" id="search-prev" title="Предыдущее совпадение">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 8L1 4h8z" fill="currentColor"/></svg>
+          </button>
+          <button class="toolbar-btn" id="search-next" title="Следующее совпадение">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2l4 4H1z" fill="currentColor"/></svg>
+          </button>
+        </div>
         <!-- Pane Content Area (Viewport) -->
         <div class="pane-content">
           <!-- Viewport -->

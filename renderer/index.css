@@ -321,7 +321,63 @@ html, body {
    ================================================ */
 .pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; background: var(--bg); }
 
+/* ================================================
+   TOOLBAR (search bar)
+   ================================================ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--search-h);
+  padding: 0 10px 0 14px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
 
+.search-input {
+  flex: 1;
+  height: 28px;
+  background: var(--bg-input);
+  border: 1px solid transparent;
+  border-radius: var(--r-input);
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text);
+  outline: none;
+  transition: background var(--t), border-color var(--t);
+  min-width: 0;
+}
+.search-input:focus {
+  background: var(--bg-input-focus);
+  border-color: var(--border);
+}
+.search-input::placeholder { color: var(--text-3); }
+
+.search-count {
+  font-size: 11px;
+  color: var(--text-3);
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.toolbar-btn {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: var(--r-sm);
+  background: transparent; color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--t), color var(--t);
+}
+.toolbar-btn:hover { background: var(--bg-hover); color: var(--text); }
+
+/* Search highlights */
+mark.sh     { background: var(--hl);     color: inherit; border-radius: 2px; padding: 0 1px; }
+mark.sh-cur { background: var(--hl-cur); color: inherit; }
 
 /* ================================================
    VIEWPORT
