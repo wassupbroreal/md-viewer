@@ -10,8 +10,10 @@
   --bg:           #f3f3f3;
   --bg-sidebar:   #f9f9f9;
   --bg-surface:   #ffffff;
-  --bg-hover:     #f3f3f3;
-  --bg-active:    #eaeaea;
+  --bg-hover:     #ebebeb;
+  --bg-active:    #e4e4e4;
+  --bg-hover-light: #f3f3f3;
+  --bg-active-light: #eaeaea;
   --bg-titlebar:  #efefef;
   --bg-input:     #eeeeee;
   --bg-input-focus: #e5e5e5;
@@ -50,8 +52,10 @@
   --bg:           #1b1b1b;
   --bg-sidebar:   #202020;
   --bg-surface:   #2d2d2d;
-  --bg-hover:     #404040;
-  --bg-active:    #4c4c4c;
+  --bg-hover:     #383838;
+  --bg-active:    #404040;
+  --bg-hover-light: #404040;
+  --bg-active-light: #4c4c4c;
   --bg-titlebar:  #202020;
   --bg-input:     #121212;
   --bg-input-focus: #181818;
@@ -351,6 +355,9 @@ html, body {
 .icon-btn:hover  { background: var(--bg-hover); color: var(--text); }
 .icon-btn:active { background: var(--bg-active); }
 .icon-btn.sm { width: 24px; height: 24px; font-size: 12px; }
+
+.toolbar .icon-btn:hover  { background: var(--bg-hover-light) !important; }
+.toolbar .icon-btn:active { background: var(--bg-active-light) !important; }
 
 .search-input-wrapper {
   position: relative;
