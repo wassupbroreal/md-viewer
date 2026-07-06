@@ -10,8 +10,8 @@
   --bg:           #f3f3f3;
   --bg-sidebar:   #f9f9f9;
   --bg-surface:   #ffffff;
-  --bg-hover:     #ebebeb;
-  --bg-active:    #e4e4e4;
+  --bg-hover:     #f3f3f3;
+  --bg-active:    #eaeaea;
   --bg-titlebar:  #efefef;
   --bg-input:     #eeeeee;
   --bg-input-focus: #e5e5e5;
@@ -50,8 +50,8 @@
   --bg:           #1b1b1b;
   --bg-sidebar:   #202020;
   --bg-surface:   #2d2d2d;
-  --bg-hover:     #383838;
-  --bg-active:    #404040;
+  --bg-hover:     #404040;
+  --bg-active:    #4c4c4c;
   --bg-titlebar:  #202020;
   --bg-input:     #121212;
   --bg-input-focus: #181818;
@@ -171,7 +171,8 @@ html, body {
 .wbtn:hover       { background-color: var(--bg-hover); }
 .wbtn-close:hover { background-color: #c42b1c; color: #fff; }
 
-#btn-open.wbtn {
+#btn-open.wbtn,
+#btn-settings.wbtn {
   width: auto;
   padding: 0 12px;
   font-size: 12px;

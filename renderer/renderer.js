@@ -645,6 +645,9 @@ function applySettings() {
   // Open File button text translation
   $('btn-open').textContent = dict.openBtn;
 
+  // Settings button text translation
+  $('btn-settings').textContent = dict.settingsTitle;
+
   // Recent list empty state
   loadRecent();
 
