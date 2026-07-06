@@ -369,12 +369,13 @@ html, body {
   z-index: 2;
 }
 
-/* Search input — darker rounded background, no border */
+/* Search input — flat, no borders, matches toolbar styles */
 #search-input {
   width: 100%;
-  border: none;
-  border-radius: var(--r-input);
-  background: var(--bg-input);
+  border: none !important;
+  outline: none !important;
+  border-radius: 0 !important;
+  background: var(--bg-surface) !important;
   font-family: var(--font);
   font-size: 13px;
   color: var(--text);
@@ -383,7 +384,7 @@ html, body {
   z-index: 1;
   height: 100%;
 }
-#search-input:focus { background: var(--bg-input-focus); }
+#search-input:focus { background: var(--bg-hover) !important; }
 #search-input::placeholder { color: var(--text-3); }
 
 .search-nav {
