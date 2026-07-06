@@ -10,11 +10,11 @@
   --bg:           #f3f3f3;
   --bg-sidebar:   #f9f9f9;
   --bg-surface:   #ffffff;
-  --bg-hover:     #ebebeb;
-  --bg-active:    #e4e4e4;
-  --bg-hover-light: #f3f3f3;
-  --bg-active-light: #eaeaea;
-  --bg-titlebar:  #efefef;
+  --bg-hover:     #f3f3f3;
+  --bg-active:    #eaeaea;
+  --bg-hover-light: #f7f7f7;
+  --bg-active-light: #f1f1f1;
+  --bg-titlebar:  #f7f7f7;
   --bg-input:     #eeeeee;
   --bg-input-focus: #e5e5e5;
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d5d5d' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -44,7 +44,7 @@
   --font-mono:    'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
   --font-serif:   'Georgia', 'Times New Roman', serif;
   --mono:         'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
-  --t:            0s;
+  --t:            0.15s;
 }
 
 :root.dark {
@@ -52,11 +52,11 @@
   --bg:           #1b1b1b;
   --bg-sidebar:   #202020;
   --bg-surface:   #2d2d2d;
-  --bg-hover:     #383838;
-  --bg-active:    #404040;
-  --bg-hover-light: #404040;
+  --bg-hover:     #3a3a3a;
+  --bg-active:    #444444;
+  --bg-hover-light: #444444;
   --bg-active-light: #4c4c4c;
-  --bg-titlebar:  #202020;
+  --bg-titlebar:  #262626;
   --bg-input:     #121212;
   --bg-input-focus: #181818;
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -122,6 +122,7 @@ html, body {
   flex-shrink: 0;
   /* Entire bar is drag region by default */
   -webkit-app-region: drag;
+  position: relative;
 }
 
 /* App name — always left */
@@ -143,14 +144,18 @@ html, body {
 
 /* File name — centered between the two spacers */
 .tb-file {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 12px;
   color: var(--text-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: calc(100% - 320px);
+  max-width: calc(100% - 460px);
   flex-shrink: 0;
   text-align: center;
+  -webkit-app-region: drag;
 }
 
 /* Window buttons — no drag */
@@ -331,12 +336,14 @@ html, body {
   flex-shrink: 0;
 }
 .toolbar-search {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  z-index: 1;
 }
 .toolbar-right { display: flex; align-items: center; gap: 0; flex-shrink: 0; height: 100%; z-index: 10; margin-left: auto; }
 .file-meta { font-size: 11px; color: var(--text-3); padding: 0 8px; }
@@ -601,7 +608,7 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: none !important;
+  animation: fadeIn var(--t) ease-out;
 }
 .modal-card {
   width: 320px;
@@ -611,7 +618,7 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
-  animation: none !important;
+  animation: scaleIn var(--t) cubic-bezier(0.1, 0.9, 0.2, 1);
   overflow: hidden;
 }
 .modal-header {
