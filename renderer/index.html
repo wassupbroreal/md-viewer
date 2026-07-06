@@ -65,19 +65,23 @@
 
       <!-- Toolbar -->
       <div class="toolbar">
-        <button class="icon-btn" id="btn-toggle-sidebar">
-          <span class="material-symbols-outlined">view_sidebar</span>
-        </button>
-        <div class="toolbar-path" id="toolbar-path">
-          <span class="path-hint">Выберите файл для просмотра</span>
+        <div class="toolbar-search">
+          <div class="search-input-wrapper">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input id="search-input" type="text" placeholder="Search" autocomplete="off" spellcheck="false" />
+          </div>
+          <button class="icon-btn sm search-nav-btn" id="btn-s-prev" tabindex="-1" title="Предыдущее совпадение">
+            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_up</span>
+          </button>
+          <button class="icon-btn sm search-nav-btn" id="btn-s-next" tabindex="-1" title="Следующее совпадение">
+            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_down</span>
+          </button>
+          <span class="search-count" id="search-count"></span>
         </div>
         <div class="toolbar-right">
           <span class="file-meta" id="file-meta"></span>
           <button class="icon-btn" id="btn-explorer" style="display:none">
             <span class="material-symbols-outlined">open_in_new</span>
-          </button>
-          <button class="icon-btn" id="btn-search">
-            <span class="material-symbols-outlined">search</span>
           </button>
           <button class="icon-btn" id="btn-settings">
             <span class="material-symbols-outlined">settings</span>
@@ -85,25 +89,7 @@
         </div>
       </div>
 
-      <!-- Search bar (animated, hidden via CSS class) -->
-      <div class="search-wrap" id="search-wrap">
-        <div class="search-inner">
-          <div class="search-input-wrapper">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input id="search-input" type="text" placeholder="Search" autocomplete="off" spellcheck="false" />
-          </div>
-          <button class="icon-btn sm search-nav-btn" id="btn-s-prev" tabindex="-1">
-            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_up</span>
-          </button>
-          <button class="icon-btn sm search-nav-btn" id="btn-s-next" tabindex="-1">
-            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_down</span>
-          </button>
-          <span class="search-count" id="search-count"></span>
-          <button class="icon-btn sm search-close" id="btn-s-close" tabindex="-1">✕</button>
-        </div>
-      </div>
-
-      <!-- Pane Content Area (Viewport + Outline sidebar) -->
+      <!-- Pane Content Area (Viewport) -->
       <div class="pane-content">
         <!-- Viewport -->
         <div class="viewport" id="viewport">
@@ -131,27 +117,12 @@
           <article class="md" id="md-out" style="display:none"></article>
 
         </div>
-
-        <!-- Outline / Table of Contents (Right Sidebar) -->
-        <aside class="outline" id="outline" style="display: none;">
-          <div class="outline-body">
-            <ul class="outline-list" id="outline-list"></ul>
-          </div>
-        </aside>
       </div>
     </div>
   </div>
 
   <!-- Drop overlay -->
   <div class="drop-overlay" id="drop-overlay" style="display:none"></div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-left"></div>
-    <div class="footer-right">
-      <span class="app-version" id="app-version-text">v1.0.0</span>
-    </div>
-  </footer>
 
   <!-- Modal Settings -->
   <div class="modal-overlay" id="settings-modal" style="display:none">

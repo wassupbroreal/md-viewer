@@ -144,7 +144,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 340px;
+  max-width: calc(100% - 320px);
   flex-shrink: 0;
   text-align: center;
 }
@@ -175,7 +175,7 @@ html, body {
    ================================================ */
 .layout {
   display: flex;
-  height: calc(100vh - var(--tbar-h) - var(--footer-h));
+  height: calc(100vh - var(--tbar-h));
 }
 
 /* ================================================
@@ -189,10 +189,8 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: width var(--t), min-width var(--t);
   flex-shrink: 0;
 }
-.sidebar.collapsed { width: 0; min-width: 0; }
 
 .sidebar-top {
   height: var(--toolbar-h); /* match main toolbar height (38px) */
@@ -332,10 +330,14 @@ html, body {
   padding: 0; /* no padding */
   flex-shrink: 0;
 }
-.toolbar-path { flex: 1; font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px; }
-.path-hint { color: var(--text-3); }
-.path-dir  { color: var(--text-3); }
-.path-name { color: var(--text); font-weight: 500; }
+.toolbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding-left: 12px;
+}
 .toolbar-right { display: flex; align-items: center; gap: 0; flex-shrink: 0; height: 100%; }
 .file-meta { font-size: 11px; color: var(--text-3); padding: 0 8px; }
 
@@ -353,32 +355,12 @@ html, body {
 .icon-btn:active { background: var(--bg-active); }
 .icon-btn.sm { width: 24px; height: 24px; font-size: 12px; }
 
-/* ================================================
-   SEARCH — instant appearance
-   ================================================ */
-.search-wrap {
-  display: none;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
-}
-.search-wrap.open {
-  display: block;
-}
-
-.search-inner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  height: var(--search-h);
-}
-
 .search-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1;
-  max-width: 320px;
+  flex: 0 1 280px;
+  min-width: 140px;
 }
 
 .search-icon {
@@ -406,12 +388,8 @@ html, body {
 #search-input:focus { background: var(--bg-input-focus); }
 #search-input::placeholder { color: var(--text-3); }
 
-/* push count + buttons to the right */
-/* Bolder nav buttons and close */
 .search-nav-btn { font-size: 9px; font-weight: 700; color: var(--text-2); }
 .search-count   { font-size: 11px; color: var(--text-3); white-space: nowrap; margin-left: 4px; }
-/* Close pushed to far right, bolder */
-.search-close   { font-size: 13px; font-weight: 700; color: var(--text-2); margin-left: auto; }
 
 /* ================================================
    VIEWPORT
@@ -594,35 +572,7 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   animation: spin .7s linear infinite;
 }
 
-/* ================================================
-   FOOTER
-   ================================================ */
-.footer {
-  height: var(--footer-h);
-  border-top: 1px solid var(--border);
-  background: var(--bg-surface);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5px; /* 5px margins on left/right for alignment */
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-.footer-left {
-  display: flex;
-  align-items: center;
-}
-.footer-right {
-  display: flex;
-  align-items: center;
-  margin-left: auto; /* force push to the rightmost side */
-}
-.app-version {
-  font-size: 11px;
-  color: var(--text-3);
-  padding: 0 5px;
-  font-family: var(--font);
-}
+
 
 /* ================================================
    MODAL DIALOG (SETTINGS)
@@ -746,7 +696,7 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
 }
 
 /* ================================================
-   OUTLINE (TABLE OF CONTENTS)
+   OUTLINE (TABLE OF CONTENTS) — REMOVED
    ================================================ */
 .pane-content {
   display: flex;
@@ -754,59 +704,6 @@ mark.hi.cur { background: var(--hl-cur); outline: 2px solid orange; }
   min-height: 0;
   overflow: hidden;
   position: relative;
-}
-
-.outline {
-  width: 260px;
-  min-width: 260px;
-  background: var(--bg-sidebar);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.outline-body {
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: none;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 0;
-}
-.outline-body::-webkit-scrollbar {
-  display: none;
-}
-
-.outline-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.outline-item {
-  display: flex;
-  align-items: center;
-  min-height: 30px;
-  height: auto;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-family: var(--font);
-  font-size: 12px;
-  color: var(--text-2);
-  white-space: normal;
-  word-break: break-word;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.outline-item:hover {
-  background-color: var(--bg-hover);
-  color: var(--text);
-}
-.outline-item.active {
-  background-color: var(--bg-active);
-  color: var(--text);
 }
 
 /* ================================================

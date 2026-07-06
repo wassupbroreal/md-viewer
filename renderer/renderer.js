@@ -234,15 +234,11 @@ const el = {
   mdOut:       $('md-out'),
   viewport:    $('viewport'),
   winTitle:    $('win-title'),
-  toolbarPath: $('toolbar-path'),
   fileMeta:    $('file-meta'),
   btnExplorer: $('btn-explorer'),
-  searchWrap:  $('search-wrap'),
   searchInput: $('search-input'),
   searchCount: $('search-count'),
   dropOverlay: $('drop-overlay'),
-  outline:     $('outline'),
-  outlineList: $('outline-list'),
 };
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
@@ -260,15 +256,11 @@ setupDrop();
 window.api.onLoading(() => showSpinner());
 window.api.onFile((data)  => renderContent(data));
 window.api.onError((msg)  => { hideSpinner(); alert('Ошибка:\n' + msg); });
-el.viewport.addEventListener('scroll', syncOutlineScroll);
 
 // ── Title bar ─────────────────────────────────────────────────────────────────
 $('btn-min').addEventListener('click',   () => window.api.minimize());
 $('btn-max').addEventListener('click',   () => window.api.maximize());
 $('btn-close').addEventListener('click', () => window.api.close());
-
-// ── Sidebar ───────────────────────────────────────────────────────────────────
-$('btn-toggle-sidebar').addEventListener('click', () => el.sidebar.classList.toggle('collapsed'));
 
 // ── Open file ─────────────────────────────────────────────────────────────────
 $('btn-open').addEventListener('click',         () => window.api.openDialog());
@@ -279,26 +271,20 @@ el.btnExplorer.addEventListener('click', () => {
 });
 
 // ── Search ────────────────────────────────────────────────────────────────────
-$('btn-search').addEventListener('click', openSearch);
-$('btn-s-close').addEventListener('click', closeSearch);
 $('btn-s-prev').addEventListener('click', () => stepSearch(-1));
 $('btn-s-next').addEventListener('click', () => stepSearch(1));
 el.searchInput.addEventListener('input', () => doSearch(el.searchInput.value));
 el.searchInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter')  { e.preventDefault(); stepSearch(e.shiftKey ? -1 : 1); }
-  if (e.key === 'Escape') closeSearch();
+  if (e.key === 'Escape') { closeSearch(); el.searchInput.blur(); }
 });
 
 function openSearch() {
-  if (searchOpen) { el.searchInput.focus(); el.searchInput.select(); return; }
-  searchOpen = true;
-  el.searchWrap.classList.add('open');
-  setTimeout(() => { el.searchInput.focus(); el.searchInput.select(); }, 200);
+  el.searchInput.focus();
+  el.searchInput.select();
 }
 
 function closeSearch() {
-  searchOpen = false;
-  el.searchWrap.classList.remove('open');
   clearHighlights();
   searchMatches = []; searchIdx = -1;
   el.searchCount.textContent = '';
@@ -377,12 +363,9 @@ function showWelcome() {
   el.mdOut.innerHTML       = '';
   el.welcome.style.display = '';
   el.winTitle.textContent  = '';
-  el.toolbarPath.innerHTML = '<span class="path-hint">' + (typeof settings !== 'undefined' && settings.lang === 'ru' ? 'Выберите файл для просмотра' : 'Select a file to view') + '</span>';
   el.fileMeta.textContent  = '';
   el.btnExplorer.style.display = 'none';
-  if (searchOpen) closeSearch();
-  el.outline.style.display = 'none';
-  el.outlineList.innerHTML = '';
+  closeSearch();
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -416,15 +399,8 @@ function renderContent(data) {
   el.welcome.style.display = 'none';
   el.mdOut.style.display   = 'block';
 
-  // Breadcrumb
-  const sep = data.path.includes('\\') ? '\\' : '/';
-  const dir = data.path.substring(0, data.path.lastIndexOf(sep));
-  el.toolbarPath.innerHTML =
-    '<span class="path-dir">' + esc(dir) + sep + '</span>' +
-    '<span class="path-name">' + esc(data.name) + '</span>';
-
-  // Title bar: only the filename, centered
-  el.winTitle.textContent      = data.name;
+  // Title bar: show full path, centered
+  el.winTitle.textContent      = data.path;
   el.fileMeta.textContent      = fmtSize(data.size) + ' · ' + fmtDate(data.modified);
   el.btnExplorer.style.display = '';
   el.viewport.scrollTop        = 0;
@@ -433,8 +409,7 @@ function renderContent(data) {
   if (typeof settings !== 'undefined' && settings.lineNumbers) {
     updateAllCodeBlocksLineNumbers();
   }
-  if (searchOpen && el.searchInput.value) doSearch(el.searchInput.value);
-  generateOutline();
+  if (el.searchInput.value) doSearch(el.searchInput.value);
 }
 
 // ── Recent files ──────────────────────────────────────────────────────────────
@@ -516,7 +491,7 @@ function setupDrop() {
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'o') { e.preventDefault(); window.api.openDialog(); }
   if (e.ctrlKey && e.key === 'f') { e.preventDefault(); openSearch(); }
-  if (e.key === 'Escape' && searchOpen) closeSearch();
+  if (e.key === 'Escape') { closeSearch(); el.searchInput.blur(); }
 });
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -650,12 +625,6 @@ function initSettings() {
     applySettings();
   });
 
-  // Load app version in footer
-  if (invoke) {
-    invoke('get_app_version').then(v => {
-      $('app-version-text').textContent = 'v' + v;
-    }).catch(err => console.error(err));
-  }
 }
 
 function applySettings() {
@@ -676,11 +645,6 @@ function applySettings() {
 
   // Recent list empty state
   loadRecent();
-
-  // Toolbar path hint
-  if (!currentFilePath) {
-    el.toolbarPath.innerHTML = '<span class="path-hint">' + dict.pathHint + '</span>';
-  }
 
   // Search input placeholder
   el.searchInput.placeholder = dict.searchPlaceholder;
@@ -710,110 +674,4 @@ function applySettings() {
 // Call initSettings on boot
 initSettings();
 
-// ── Outline Panel (Table of Contents) ──────────────────────────────────────────
-function generateOutline() {
-  el.outlineList.innerHTML = '';
-  const headings = el.mdOut.querySelectorAll('h2');
-  
-  if (!headings.length) {
-    el.outline.style.display = 'none';
-    return;
-  }
 
-  const ids = new Set();
-  headings.forEach((heading, idx) => {
-    let id = heading.id;
-    if (!id) {
-      const text = heading.textContent.trim().toLowerCase()
-        .replace(/[^\w\sа-яё\-]/gi, '')
-        .replace(/\s+/g, '-');
-      id = text || 'heading-' + idx;
-      
-      let uniqueId = id;
-      let count = 1;
-      while (ids.has(uniqueId)) {
-        uniqueId = id + '-' + count;
-        count++;
-      }
-      id = uniqueId;
-      heading.id = id;
-    }
-    ids.add(id);
-
-    const li = document.createElement('li');
-    li.className = 'outline-item ' + heading.tagName.toLowerCase();
-    li.textContent = heading.textContent.trim();
-    li.title = heading.textContent.trim();
-    
-    li.onclick = () => {
-      isProgrammaticScrolling = true;
-      heading.scrollIntoView({ block: 'start' });
-      
-      const items = el.outlineList.querySelectorAll('.outline-item');
-      items.forEach(item => item.classList.remove('active'));
-      li.classList.add('active');
-
-      if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        isProgrammaticScrolling = false;
-        syncOutlineScroll();
-      }, 100);
-    };
-
-    el.outlineList.appendChild(li);
-  });
-
-  el.outline.style.display = 'flex';
-  syncOutlineScroll();
-}
-
-function syncOutlineScroll() {
-  if (isProgrammaticScrolling) return;
-  const headings = Array.from(el.mdOut.querySelectorAll('h2'));
-  if (!headings.length) return;
-
-  const viewportRect = el.viewport.getBoundingClientRect();
-  const threshold = 80;
-
-  let activeHeading = null;
-
-  for (let i = 0; i < headings.length; i++) {
-    const heading = headings[i];
-    const rect = heading.getBoundingClientRect();
-    const relativeTop = rect.top - viewportRect.top;
-
-    if (relativeTop <= threshold) {
-      activeHeading = heading;
-    } else {
-      break;
-    }
-  }
-
-  if (!activeHeading && headings.length > 0) {
-    activeHeading = headings[0];
-  }
-
-  const items = el.outlineList.querySelectorAll('.outline-item');
-  items.forEach((item, idx) => {
-    const heading = headings[idx];
-    if (heading === activeHeading) {
-      item.classList.add('active');
-      
-      const outlineBody = el.outline.querySelector('.outline-body');
-      if (outlineBody) {
-        const itemTop = item.offsetTop;
-        const itemHeight = item.offsetHeight;
-        const containerHeight = outlineBody.clientHeight;
-        const containerScrollTop = outlineBody.scrollTop;
-
-        if (itemTop < containerScrollTop) {
-          outlineBody.scrollTop = itemTop - 10;
-        } else if (itemTop + itemHeight > containerScrollTop + containerHeight) {
-          outlineBody.scrollTop = itemTop + itemHeight - containerHeight + 10;
-        }
-      }
-    } else {
-      item.classList.remove('active');
-    }
-  });
-}
