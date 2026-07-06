@@ -234,10 +234,6 @@ const el = {
   mdOut:       $('md-out'),
   viewport:    $('viewport'),
   winTitle:    $('win-title'),
-  fileMeta:    $('file-meta'),
-  btnExplorer: $('btn-explorer'),
-  searchInput: $('search-input'),
-  searchCount: $('search-count'),
   dropOverlay: $('drop-overlay'),
 };
 
@@ -262,90 +258,8 @@ $('btn-min').addEventListener('click',   () => window.api.minimize());
 $('btn-max').addEventListener('click',   () => window.api.maximize());
 $('btn-close').addEventListener('click', () => window.api.close());
 
-// ── Sidebar collapse ──────────────────────────────────────────────────────────
-$('btn-toggle-sidebar').addEventListener('click', () => el.sidebar.classList.toggle('collapsed'));
-
 // ── Open file ─────────────────────────────────────────────────────────────────
 $('btn-open').addEventListener('click',         () => window.api.openDialog());
-
-// ── Explorer ──────────────────────────────────────────────────────────────────
-el.btnExplorer.addEventListener('click', () => {
-  if (currentFilePath) window.api.showInExplorer(currentFilePath);
-});
-
-// ── Search ────────────────────────────────────────────────────────────────────
-$('btn-s-prev').addEventListener('click', () => stepSearch(-1));
-$('btn-s-next').addEventListener('click', () => stepSearch(1));
-el.searchInput.addEventListener('input', () => doSearch(el.searchInput.value));
-el.searchInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter')  { e.preventDefault(); stepSearch(e.shiftKey ? -1 : 1); }
-  if (e.key === 'Escape') { closeSearch(); el.searchInput.blur(); }
-});
-
-function openSearch() {
-  el.searchInput.focus();
-  el.searchInput.select();
-}
-
-function closeSearch() {
-  clearHighlights();
-  searchMatches = []; searchIdx = -1;
-  el.searchCount.textContent = '';
-  el.searchInput.value = '';
-}
-
-function doSearch(q) {
-  clearHighlights();
-  searchMatches = []; searchIdx = -1;
-  if (!q || !currentFilePath) { el.searchCount.textContent = ''; return; }
-
-  const re = new RegExp(reEsc(q), 'gi');
-  const walker = document.createTreeWalker(el.mdOut, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  let n;
-  while ((n = walker.nextNode())) nodes.push(n);
-
-  nodes.forEach(tn => {
-    if (!re.test(tn.textContent)) return;
-    re.lastIndex = 0;
-    const frag = document.createDocumentFragment();
-    let last = 0, m;
-    while ((m = re.exec(tn.textContent)) !== null) {
-      frag.appendChild(document.createTextNode(tn.textContent.slice(last, m.index)));
-      const mark = document.createElement('mark');
-      mark.className = 'hi';
-      mark.textContent = m[0];
-      frag.appendChild(mark);
-      searchMatches.push(mark);
-      last = m.index + m[0].length;
-    }
-    frag.appendChild(document.createTextNode(tn.textContent.slice(last)));
-    tn.parentNode.replaceChild(frag, tn);
-  });
-
-  if (searchMatches.length) { searchIdx = 0; showCurrent(); }
-  else el.searchCount.textContent = 'Не найдено';
-}
-
-function stepSearch(d) {
-  if (!searchMatches.length) return;
-  searchMatches[searchIdx]?.classList.remove('cur');
-  searchIdx = (searchIdx + d + searchMatches.length) % searchMatches.length;
-  showCurrent();
-}
-
-function showCurrent() {
-  const m = searchMatches[searchIdx];
-  if (!m) return;
-  m.classList.add('cur');
-  m.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  el.searchCount.textContent = (searchIdx + 1) + '/' + searchMatches.length;
-}
-
-function clearHighlights() {
-  el.mdOut.querySelectorAll('mark.hi').forEach(m => m.replaceWith(document.createTextNode(m.textContent)));
-  el.mdOut.normalize();
-}
 
 // ── Spinner — uses style.display (no hidden attribute) ───────────────────────
 function showSpinner() {
@@ -366,9 +280,6 @@ function showWelcome() {
   el.mdOut.innerHTML       = '';
   el.welcome.style.display = '';
   el.winTitle.textContent  = '';
-  el.fileMeta.textContent  = '';
-  el.btnExplorer.style.display = 'none';
-  closeSearch();
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -404,15 +315,12 @@ function renderContent(data) {
 
   // Title bar: show full path, centered
   el.winTitle.textContent      = data.path;
-  el.fileMeta.textContent      = fmtSize(data.size) + ' · ' + fmtDate(data.modified);
-  el.btnExplorer.style.display = '';
   el.viewport.scrollTop        = 0;
 
   loadRecent();
   if (typeof settings !== 'undefined' && settings.lineNumbers) {
     updateAllCodeBlocksLineNumbers();
   }
-  if (el.searchInput.value) doSearch(el.searchInput.value);
 }
 
 // ── Recent files ──────────────────────────────────────────────────────────────
@@ -493,8 +401,6 @@ function setupDrop() {
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'o') { e.preventDefault(); window.api.openDialog(); }
-  if (e.ctrlKey && e.key === 'f') { e.preventDefault(); openSearch(); }
-  if (e.key === 'Escape') { closeSearch(); el.searchInput.blur(); }
 });
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -651,8 +557,7 @@ function applySettings() {
   // Recent list empty state
   loadRecent();
 
-  // Search input placeholder
-  el.searchInput.placeholder = dict.searchPlaceholder;
+
 
   // Settings Modal labels
   $('settings-title-text').textContent = dict.settingsTitle;
