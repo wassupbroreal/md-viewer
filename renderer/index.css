@@ -32,7 +32,7 @@
   --r:            5px;
   --r-sm:         3px;
   --r-input:      5px;
-  --sidebar-w:    260px;
+  --sidebar-w:    220px;
   --tbar-h:       31px;
   --toolbar-h:    38px;
   --footer-h:     28px;
@@ -166,6 +166,7 @@ html, body {
   justify-content: center;
   cursor: pointer;
   transition: background-color var(--t), color var(--t);
+  -webkit-app-region: no-drag;
 }
 .wbtn:hover       { background-color: var(--bg-hover); }
 .wbtn-close:hover { background-color: #c42b1c; color: #fff; }
@@ -189,40 +190,13 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width var(--t), min-width var(--t);
   flex-shrink: 0;
 }
-
-.sidebar-top {
-  height: var(--toolbar-h); /* match main toolbar height (38px) */
-  padding: 0; /* no margins */
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border); /* elegant divider line */
-  background: var(--bg-surface); /* completely white background to match toolbar */
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
+.sidebar.collapsed {
+  width: 0;
+  min-width: 0;
 }
-
-.btn-open {
-  height: 100%; /* fills the 38px content area */
-  width: auto; /* fit-content width, moved to the left */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 12px;
-  background: transparent; /* transparent by default */
-  color: var(--text-2);
-  border: none;
-  border-radius: 0; /* square edges for edgeless button layout */
-  font-family: var(--font);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--t), color var(--t);
-}
-.btn-open:hover  { background: var(--bg-hover); color: var(--text); }
-.btn-open:active { background: var(--bg-active); }
 
 .sidebar-body {
   flex: 1;
@@ -331,14 +305,16 @@ html, body {
   flex-shrink: 0;
 }
 .toolbar-search {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-  padding-left: 12px;
+  justify-content: center;
+  pointer-events: none;
 }
-.toolbar-right { display: flex; align-items: center; gap: 0; flex-shrink: 0; height: 100%; }
+.toolbar-right { display: flex; align-items: center; gap: 0; flex-shrink: 0; height: 100%; z-index: 10; }
 .file-meta { font-size: 11px; color: var(--text-3); padding: 0 8px; }
 
 /* Icon button */
@@ -350,6 +326,7 @@ html, body {
   cursor: pointer;
   transition: background var(--t), color var(--t);
   flex-shrink: 0;
+  z-index: 10;
 }
 .icon-btn:hover  { background: var(--bg-hover); color: var(--text); }
 .icon-btn:active { background: var(--bg-active); }
@@ -359,8 +336,8 @@ html, body {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 0 1 280px;
-  min-width: 140px;
+  flex: 0 0 280px;
+  pointer-events: auto;
 }
 
 .search-icon {
@@ -388,6 +365,14 @@ html, body {
 #search-input:focus { background: var(--bg-input-focus); }
 #search-input::placeholder { color: var(--text-3); }
 
+.search-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+  position: absolute;
+  left: calc(50% + 140px + 8px);
+}
 .search-nav-btn { font-size: 9px; font-weight: 700; color: var(--text-2); }
 .search-count   { font-size: 11px; color: var(--text-3); white-space: nowrap; margin-left: 4px; }
 

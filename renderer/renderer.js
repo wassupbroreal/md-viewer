@@ -262,6 +262,9 @@ $('btn-min').addEventListener('click',   () => window.api.minimize());
 $('btn-max').addEventListener('click',   () => window.api.maximize());
 $('btn-close').addEventListener('click', () => window.api.close());
 
+// ── Sidebar collapse ──────────────────────────────────────────────────────────
+$('btn-toggle-sidebar').addEventListener('click', () => el.sidebar.classList.toggle('collapsed'));
+
 // ── Open file ─────────────────────────────────────────────────────────────────
 $('btn-open').addEventListener('click',         () => window.api.openDialog());
 
@@ -639,9 +642,8 @@ function applySettings() {
   // Apply language (translate all elements)
   const dict = i18n[settings.lang];
 
-  // Sidebar
-  const openBtnSpan = $('btn-open').querySelector('span');
-  if (openBtnSpan) openBtnSpan.textContent = dict.openBtn;
+  // Open File tooltip translation
+  $('btn-open').title = dict.openBtn;
 
   // Recent list empty state
   loadRecent();

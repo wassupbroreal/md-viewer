@@ -23,6 +23,9 @@
   <header class="titlebar">
     <!-- App name — always left -->
     <span class="tb-app">MD Viewer</span>
+    <button id="btn-open" class="wbtn" title="Открыть файл" aria-label="Открыть файл">
+      <span class="material-symbols-outlined" style="font-size: 16px;">folder_open</span>
+    </button>
     <!-- Drag spacer left -->
     <div class="tb-drag"></div>
     <!-- File name — always center -->
@@ -47,12 +50,6 @@
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-top">
-        <button class="btn-open" id="btn-open">
-          <span>Открыть файл</span>
-        </button>
-      </div>
-
       <div class="sidebar-body">
         <ul class="recent" id="recent-list">
           <li class="recent-empty">Нет недавних файлов</li>
@@ -65,18 +62,23 @@
 
       <!-- Toolbar -->
       <div class="toolbar">
+        <button class="icon-btn" id="btn-toggle-sidebar" title="Свернуть боковую панель">
+          <span class="material-symbols-outlined">view_sidebar</span>
+        </button>
         <div class="toolbar-search">
           <div class="search-input-wrapper">
             <span class="material-symbols-outlined search-icon">search</span>
             <input id="search-input" type="text" placeholder="Search" autocomplete="off" spellcheck="false" />
           </div>
-          <button class="icon-btn sm search-nav-btn" id="btn-s-prev" tabindex="-1" title="Предыдущее совпадение">
-            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_up</span>
-          </button>
-          <button class="icon-btn sm search-nav-btn" id="btn-s-next" tabindex="-1" title="Следующее совпадение">
-            <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_down</span>
-          </button>
-          <span class="search-count" id="search-count"></span>
+          <div class="search-nav" id="search-nav-controls">
+            <button class="icon-btn sm search-nav-btn" id="btn-s-prev" tabindex="-1" title="Предыдущее совпадение">
+              <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_up</span>
+            </button>
+            <button class="icon-btn sm search-nav-btn" id="btn-s-next" tabindex="-1" title="Следующее совпадение">
+              <span class="material-symbols-outlined" style="font-size: 16px;">keyboard_arrow_down</span>
+            </button>
+            <span class="search-count" id="search-count"></span>
+          </div>
         </div>
         <div class="toolbar-right">
           <span class="file-meta" id="file-meta"></span>
