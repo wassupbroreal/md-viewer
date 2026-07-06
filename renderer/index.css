@@ -337,13 +337,13 @@ html, body {
 }
 .toolbar-search {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  pointer-events: none;
 }
 .toolbar-right { display: flex; align-items: center; gap: 0; flex-shrink: 0; height: 100%; z-index: 10; margin-left: auto; }
 .file-meta { font-size: 11px; color: var(--text-3); padding: 0 8px; }
@@ -369,7 +369,6 @@ html, body {
   display: flex;
   align-items: center;
   flex: 0 0 280px;
-  height: 100%;
   pointer-events: auto;
 }
 
@@ -382,20 +381,18 @@ html, body {
   z-index: 2;
 }
 
-/* Search input — flat, no borders, matches toolbar styles */
+/* Search input — rounded, styled inside container */
 #search-input {
   width: 100%;
-  border: none !important;
-  outline: none !important;
-  border-radius: 0 !important;
-  background: var(--bg-surface) !important;
+  border: none;
+  border-radius: var(--r-input);
+  background: var(--bg-input);
   font-family: var(--font);
   font-size: 13px;
   color: var(--text);
-  padding: 0 10px 0 28px; /* 28px left padding for icon spacing */
+  padding: 4px 10px 4px 28px; /* 28px left padding for icon spacing */
   transition: background var(--t);
   z-index: 1;
-  height: 100%;
 }
 #search-input:focus { background: var(--bg-titlebar) !important; }
 #search-input::placeholder { color: var(--text-3); }
@@ -403,13 +400,13 @@ html, body {
 .search-nav {
   display: flex;
   align-items: center;
+  gap: 4px;
   pointer-events: auto;
   position: absolute;
-  left: calc(50% + 140px);
-  height: 100%;
+  left: calc(50% + 140px + 8px);
 }
 .search-nav-btn { font-size: 9px; font-weight: 700; color: var(--text-2); }
-.search-count   { font-size: 11px; color: var(--text-3); white-space: nowrap; margin-left: 4px; display: flex; align-items: center; height: 100%; }
+.search-count   { font-size: 11px; color: var(--text-3); white-space: nowrap; margin-left: 4px; }
 
 /* ================================================
    VIEWPORT
