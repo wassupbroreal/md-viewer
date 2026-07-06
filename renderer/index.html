@@ -23,7 +23,6 @@
   <header class="titlebar">
     <!-- App name — always left -->
     <span class="tb-app">MD Viewer</span>
-    <button id="btn-open" class="wbtn" title="Открыть файл" aria-label="Открыть файл">Открыть</button>
     <button id="btn-settings" class="wbtn" title="Настройки" aria-label="Настройки">Настройки</button>
     <!-- Drag spacer left -->
     <div class="tb-drag"></div>
@@ -48,29 +47,8 @@
   <div class="layout">
 
     <!-- Workspace containing sidebar and content pane horizontally -->
-    <div class="workspace">
-      <!-- Sidebar -->
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-body">
-          <ul class="recent" id="recent-list">
-            <li class="recent-empty">Нет недавних файлов</li>
-          </ul>
-        </div>
-      </aside>
-
       <!-- Content pane -->
       <div class="pane">
-        <!-- Search toolbar -->
-        <div class="toolbar" id="toolbar">
-          <input id="search-input" class="search-input" type="text" placeholder="Поиск..." autocomplete="off" spellcheck="false" />
-          <span class="search-count" id="search-count"></span>
-          <button class="toolbar-btn" id="search-prev" title="Предыдущее совпадение">
-            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 8L1 4h8z" fill="currentColor"/></svg>
-          </button>
-          <button class="toolbar-btn" id="search-next" title="Следующее совпадение">
-            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2l4 4H1z" fill="currentColor"/></svg>
-          </button>
-        </div>
         <!-- Pane Content Area (Viewport) -->
         <div class="pane-content">
           <!-- Viewport -->

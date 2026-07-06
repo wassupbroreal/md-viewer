@@ -227,18 +227,8 @@ let scrollTimeout   = null;
 // ── DOM ──────────────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
 const el = {
-  sidebar:     $('sidebar'),
-  recentList:  $('recent-list'),
-  welcome:     $('welcome'),
-  spinner:     $('spinner'),
-  mdOut:       $('md-out'),
-  viewport:    $('viewport'),
   winTitle:    $('win-title'),
   dropOverlay: $('drop-overlay'),
-  searchInput: $('search-input'),
-  searchCount: $('search-count'),
-  searchPrev:  $('search-prev'),
-  searchNext:  $('search-next'),
 };
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
@@ -249,7 +239,6 @@ setTimeout(() => {
   setTimeout(() => { splash.style.display = 'none'; }, 380);
 }, 500);
 
-loadRecent();
 setupDrop();
 
 // ── IPC ───────────────────────────────────────────────────────────────────────
@@ -263,7 +252,7 @@ $('btn-max').addEventListener('click',   () => window.api.maximize());
 $('btn-close').addEventListener('click', () => window.api.close());
 
 // ── Open file ─────────────────────────────────────────────────────────────────
-$('btn-open').addEventListener('click',         () => window.api.openDialog());
+// Open dialog has been removed.
 
 // ── Spinner — uses style.display (no hidden attribute) ───────────────────────
 function showSpinner() {
@@ -320,61 +309,11 @@ function renderContent(data) {
   // Title bar: show full path, centered
   el.winTitle.textContent      = data.path;
   el.viewport.scrollTop        = 0;
-
-  loadRecent();
   if (typeof settings !== 'undefined' && settings.lineNumbers) {
     updateAllCodeBlocksLineNumbers();
   }
 }
 
-// ── Recent files ──────────────────────────────────────────────────────────────
-async function loadRecent() {
-  const files = await window.api.getRecent();
-  el.recentList.innerHTML = '';
-
-  if (!files.length) {
-    el.recentList.innerHTML = '<li class="recent-empty">' + (typeof settings !== 'undefined' && settings.lang === 'ru' ? 'Нет недавних файлов' : 'No recent files') + '</li>';
-    return;
-  }
-
-  files.forEach(f => {
-    const li = document.createElement('li');
-    li.className = ['ri',
-      f.exists ? '' : 'missing',
-      currentFilePath === f.path ? 'active' : ''
-    ].filter(Boolean).join(' ');
-
-    const body = document.createElement('div');
-    body.className = 'ri-body';
-    body.innerHTML =
-      '<div class="ri-text">' +
-        '<div class="ri-name">' + esc(f.name) + '</div>' +
-      '</div>';
-
-    if (f.exists) {
-      li.addEventListener('click', () => {
-        showSpinner();
-        window.api.openFile(f.path);
-      });
-    }
-
-    // Remove button
-    const rmBtn = document.createElement('button');
-    rmBtn.className = 'ri-rm';
-    rmBtn.textContent = '×';
-    rmBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      await window.api.removeRecent(f.path);
-      // If removed file was the active one → go back to welcome
-      if (currentFilePath === f.path) showWelcome();
-      loadRecent();
-    });
-
-    li.appendChild(body);
-    li.appendChild(rmBtn);
-    el.recentList.appendChild(li);
-  });
-}
 
 // ── Drag & drop ───────────────────────────────────────────────────────────────
 function setupDrop() {
@@ -397,89 +336,6 @@ function setupDrop() {
     });
   }
 }
-
-// ── Search ────────────────────────────────────────────────────────────────────
-function runSearch() {
-  // Clear previous highlights
-  el.mdOut.querySelectorAll('mark.sh').forEach(m => {
-    const parent = m.parentNode;
-    parent.replaceChild(document.createTextNode(m.textContent), m);
-    parent.normalize();
-  });
-  searchMatches = [];
-  searchIdx = -1;
-
-  const q = el.searchInput.value.trim();
-  if (!q || el.mdOut.style.display === 'none') {
-    el.searchCount.textContent = '';
-    return;
-  }
-
-  const walker = document.createTreeWalker(
-    el.mdOut,
-    NodeFilter.SHOW_TEXT,
-    { acceptNode: (n) => n.parentNode.nodeName !== 'SCRIPT' && n.parentNode.nodeName !== 'STYLE' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT }
-  );
-
-  const regex = new RegExp(reEsc(q), 'gi');
-  const nodesToProcess = [];
-  let node;
-  while ((node = walker.nextNode())) nodesToProcess.push(node);
-
-  nodesToProcess.forEach(textNode => {
-    const text = textNode.textContent;
-    if (!regex.test(text)) return;
-    regex.lastIndex = 0;
-
-    const frag = document.createDocumentFragment();
-    let last = 0, m;
-    while ((m = regex.exec(text)) !== null) {
-      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
-      const mark = document.createElement('mark');
-      mark.className = 'sh';
-      mark.textContent = m[0];
-      searchMatches.push(mark);
-      frag.appendChild(mark);
-      last = m.index + m[0].length;
-    }
-    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
-    textNode.parentNode.replaceChild(frag, textNode);
-  });
-
-  if (searchMatches.length > 0) {
-    searchIdx = 0;
-    highlightCurrent();
-  }
-  el.searchCount.textContent = searchMatches.length > 0 ? `1 / ${searchMatches.length}` : '0';
-}
-
-function highlightCurrent() {
-  searchMatches.forEach((m, i) => m.classList.toggle('sh-cur', i === searchIdx));
-  if (searchMatches[searchIdx]) {
-    searchMatches[searchIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-  el.searchCount.textContent = searchMatches.length > 0 ? `${searchIdx + 1} / ${searchMatches.length}` : '0';
-}
-
-function searchStep(dir) {
-  if (!searchMatches.length) return;
-  searchIdx = (searchIdx + dir + searchMatches.length) % searchMatches.length;
-  highlightCurrent();
-}
-
-el.searchInput.addEventListener('input', runSearch);
-el.searchInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); searchStep(e.shiftKey ? -1 : 1); }
-  if (e.key === 'Escape') { el.searchInput.value = ''; runSearch(); }
-});
-el.searchPrev.addEventListener('click', () => searchStep(-1));
-el.searchNext.addEventListener('click', () => searchStep(1));
-
-// ── Keyboard shortcuts ────────────────────────────────────────────────────────
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'o') { e.preventDefault(); window.api.openDialog(); }
-  if (e.ctrlKey && e.key === 'f') { e.preventDefault(); el.searchInput.focus(); el.searchInput.select(); }
-});
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function esc(s) {
@@ -625,17 +481,8 @@ function applySettings() {
 
   // Apply language (translate all elements)
   const dict = i18n[settings.lang];
-
-  // Open File button text translation
-  $('btn-open').textContent = dict.openBtn;
-
   // Settings button text translation
   $('btn-settings').textContent = dict.settingsTitle;
-
-  // Recent list empty state
-  loadRecent();
-
-
 
   // Settings Modal labels
   $('settings-title-text').textContent = dict.settingsTitle;
